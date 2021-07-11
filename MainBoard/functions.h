@@ -78,11 +78,6 @@ uint8_t getLightReading()
 
 int readSoil()
 {
-  int moisture = 0; // initialize output variable
-  int soilPin = A2; // set signal pin to analog
-  int soilPower = 7; // sensor powered through digital pin to reduce corrosion
-  pinMode(soilPower, OUTPUT); // set digital pin as output
-  
   digitalWrite(soilPower, HIGH); // apply power
   delay(10);
   moisture = analogRead(soilPin); //read the signal value from sensor
