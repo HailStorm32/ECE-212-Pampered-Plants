@@ -45,10 +45,7 @@
  *   uint8_t -- averaged light intensity from 0-255, with 255 being brightest
  */
 uint8_t getLightReading()
-{
-  const uint8_t LDR_1_PIN = A0;
-  const uint8_t LDR_2_PIN = A1;
-      
+{   
   uint8_t ldrValue1 = 0;
   uint8_t ldrValue2 = 0;
 
@@ -58,6 +55,7 @@ uint8_t getLightReading()
 
   return ((ldrValue1+ldrValue2)/2); //Return the average of the two sensors
 }
+
 
 
 /*
@@ -75,12 +73,13 @@ uint8_t getLightReading()
  *  Middle dryness: 400-600
  *  Saturated (moist): 800-1000
  */
-
 int readSoil()
 {
-  digitalWrite(soilPower, HIGH); // apply power
+  int moisture = 0; // initialize output variable
+  
+  digitalWrite(SOIL_PWR_PIN, HIGH); // apply power
   delay(10);
-  moisture = analogRead(soilPin); //read the signal value from sensor
-  digitalWrite(soilPower, LOW); // turn sensor power off
+  moisture = analogRead(SOIL_PIN); //read the signal value from sensor
+  digitalWrite(SOIL_PWR_PIN, LOW); // turn sensor power off
   return moisture; //send value
 }
