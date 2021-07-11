@@ -58,3 +58,34 @@ uint8_t getLightReading()
 
   return ((ldrValue1+ldrValue2)/2); //Return the average of the two sensors
 }
+
+
+/*
+ * Description: Pulls reading from moisture sensor
+ *
+ * Arguments:
+ *  none
+ *
+ * Return:
+ *  int -- minimum is 0, max unknown at this time
+ *
+ * Note:
+ *  Initial calibration performed with 5V vcc, expected values will decrease as supply voltage is lowered
+ *  Dry: 0-300
+ *  Middle dryness: 400-600
+ *  Saturated (moist): 800-1000
+ */
+
+int readSoil()
+{
+  int moisture = 0; // initialize output variable
+  int soilPin = A2; // set signal pin to analog
+  int soilPower = 7; // sensor powered through digital pin to reduce corrosion
+  pinMode(soilPower, OUTPUT); // set digital pin as output
+  
+  digitalWrite(soilPower, HIGH); // apply power
+  delay(10);
+  moisture = analogRead(soilPin); //read the signal value from sensor
+  digitalWrite(soilPower, LOW); // turn sensor power off
+  return moisture; //send value
+}
