@@ -83,3 +83,40 @@ int readSoil()
   digitalWrite(SOIL_PWR_PIN, LOW); // turn sensor power off
   return moisture; //send value
 }
+
+
+/*
+ * Description: returns temperature value from DHT sensor
+ *
+ * Arguments:
+ *
+ *
+ * Return:
+ * int (units are in degrees Celsius)
+ */
+static bool measure_environment( float *temperature, float *humidity )
+{
+  static unsigned long measurement_timestamp = millis( );
+  /* Measure once every four seconds. */
+  if( millis( ) - measurement_timestamp > 3000ul )
+  {
+    if( dht_sensor.measure( temperature, humidity ) == true )
+    {
+      measurement_timestamp = millis( );
+      return( true );
+    }
+  }
+  return( false );
+}
+
+void readTemp()
+{
+  float temperature;
+  float humidity;
+  /* Measure temperature and humidity.  If the functions returns
+     true, then a measurement is available. */
+  if( measure_environment( &temperature, &humidity ) == true )
+  {
+    return temperature;
+  }
+}
