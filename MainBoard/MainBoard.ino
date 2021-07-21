@@ -2,8 +2,8 @@
 #include <dht_nonblocking.h>
 #include "LiquidCrystal_I2C.h"
 
-//---------------Begin Global Variables-----------------------------//
 
+//---------------Begin Global Variables----------------------------//
 const uint8_t SOIL_PIN = A2; // set signal pin to analog (any analog pin works)
 const uint8_t SOIL_PWR_PIN = 3; // sensor powered through digital pin to reduce corrosion (any digital pin works)
 const uint8_t LDR_1_PIN = A0;
@@ -42,7 +42,7 @@ unsigned long lastMeasurement = 0;
 uint8_t numOfLightMeasurements = 0;
 uint16_t sumOfLightReadings = 0;
 
-
+String testVar = "Test!";
 
 #define DHT_SENSOR_TYPE DHT_TYPE_11
 DHT_nonblocking dht_sensor( DHT_SENSOR_PIN, DHT_SENSOR_TYPE );
@@ -51,26 +51,40 @@ DHT_nonblocking dht_sensor( DHT_SENSOR_PIN, DHT_SENSOR_TYPE );
 #include "functions.h"//This is included here seperatly so that the gobals defined above can be used in the functions.h
 
 
+//--LCD--//
+
+LiquidCrystal_I2C lcd(0x27, 20, 4);
+
+//Dummy variable I needed to declare for Alert Function at bottom.
+//Please change this when you get a chance.
+int alertCounter = 1;
 
 
-//LCD code below
-LiquidCrystal_I2C lcd(0x27, 16, 4);
-
-const int buttonPinLeft = 5;
-const int buttonPinDown = 6;
-const int buttonPinUp = 7;
-const int buttonPinRight = 8;
-
-int buttonStateLeft = 0; 
-int buttonStateDown = 0;
-int buttonStateUp = 0;
-int buttonStateRight = 0;
+//Input & Button Logic
+const int numOfInputs = 4;
+const int inputPins[numOfInputs] = {5,6,7,8};
+int inputState[numOfInputs];
+int lastInputState[numOfInputs] = {LOW,LOW,LOW,LOW};
+bool inputFlags[numOfInputs] = {LOW,LOW,LOW,LOW};
+long lastDebounceTime[numOfInputs] = {0,0,0,0};
+long debounceDelay = 5;
 
 
-const int numOfScreens = 4;
+//Determine your screen count and creating arrays for screen and what is to be displayed
+const int numOfScreens = 10;
 int currentScreen = 0;
-String screens[numOfScreens][2] = {{"Value_1","Unit_1"}, {"Value_2", "Unit_2"}, {"Value_3","Unit_3"}, {"Value_4","Unit_4"}};
-int parameters[numOfScreens] = {0, 10, 50, 100};
+String screens[numOfScreens][5] = {{"Sensor Status 1/3","Temp:","Moisture:","Water level:"},{"Sensor Status 2/3", "Humidity:","Light:","Water resv lvl:"},{"Sensor Status 3/3","passive disp1:","passive disp2:","passive disp3:"},{"Min Temperature","deg in F"},{"Max Temperature", "Deg F"},
+{"Water Profile","Selected"},{"Light Profile","Selected"},{"Accel Time", "Secs"},{"Restart Time","Mins"},{"Analog Out. Curr.","mA"}};
+int parameters[numOfScreens];
+
+
+//Screens array and parameters array are NOT linked together.
+//screens is a variableName[10][2] array, it is a 2D array that has a table of
+// 10 squares and within the squares is 2 values stored.
+//Parameters is a different array. It is 1D. Has 10 squares with 1 value each.
+
+//--LCD End--//
+
 
 
 
@@ -78,30 +92,52 @@ void setup()
 {
   Serial.begin(9600);
 
-  //Next 2 lines is moisture sensor
+//--Moisture Sensor--//
   pinMode(SOIL_PWR_PIN, OUTPUT); 
   digitalWrite(SOIL_PWR_PIN, LOW); // set default to no power, reduces corrosion on moisture sensor
+  
+//--Moisture End--//
 
-  //This is LCD code below
-    lcd.init();   // initializing the LCD
+
+
+//--LCD--//
+
+    //This for loop pulls pin resistor values to HIGH, LOW is when pressed.
+  for(int i = 0; i < numOfInputs; i++) {
+    pinMode(inputPins[i], INPUT);
+    digitalWrite(inputPins[i], HIGH); // pull-up 20k
+  }
+
+  //Initialize LCD itself
+	lcd.init();   // initializing the LCD
   lcd.backlight(); // Enable or Turn On the backlight
 
-  pinMode(buttonPinLeft, INPUT_PULLUP);
-  pinMode(buttonPinDown, INPUT_PULLUP);
-  pinMode(buttonPinUp, INPUT_PULLUP);
-  pinMode(buttonPinRight, INPUT_PULLUP);
 
+  
+	//Initial setup of default LCD screen bootup
   lcd.clear();
-  lcd.setCursor(4,1);
-  lcd.print("THIS IS THE");
-  lcd.setCursor(3,2);
-  lcd.print("MENU TUTORIAL");
-  delay(5000);
+  lcd.setCursor(0,0);
+  lcd.print("Welcome to");
+  lcd.setCursor(0,1);
+  lcd.print("Pampered Plants v1.0");
+  lcd.setCursor(0,2);
+  lcd.print("Read our manual");
+  lcd.setCursor(0,3);
+  lcd.print("And enjoy!");
+  delay(2000);
   lcd.clear();
+  
+//--LCD End--//
+  
 }
 
 
+  
 
+
+
+//This is the loop. This is the heart that let's everything in motion.
+//It is always looping. We love loop.
 void loop() {
   //Begin sensor monitoring code
 
@@ -171,84 +207,185 @@ void loop() {
     lastMeasurement = millis();
   }
   //End sensor monitoring code
- 
-  //This is LCD code below
-  buttonStateLeft = digitalRead(buttonPinLeft);
-  buttonStateDown = digitalRead(buttonPinDown);
-  buttonStateUp = digitalRead(buttonPinUp);
-  buttonStateRight = digitalRead(buttonPinRight);
-  
-  if(buttonStateLeft == LOW){
-    lcd.clear();
+
+  //--LCD--//
+  setInputFlags();
+  resolveInputFlags();
+}
+
+
+
+//This is for the button pressing and debounce. Measures time and
+//makes sure it is only using 1 button press to send
+void setInputFlags() {
+  for(int i = 0; i < numOfInputs; i++) {
+    int reading = digitalRead(inputPins[i]);
+    if (reading != lastInputState[i]) {
+      lastDebounceTime[i] = millis();
+    }
+    if ((millis() - lastDebounceTime[i]) > debounceDelay) {
+      if (reading != inputState[i]) {
+        inputState[i] = reading;
+        if (inputState[i] == HIGH) {
+          inputFlags[i] = HIGH;
+        }
+      }
+    }
+    lastInputState[i] = reading;
+  }
+}
+
+
+//Resolve kicks off the printScreen function after it senses a button press
+void resolveInputFlags() {
+  for(int i = 0; i < numOfInputs; i++) {
+    if(inputFlags[i] == HIGH) {
+      inputAction(i);
+      inputFlags[i] = LOW;
+      printScreen();
+    }
+  }
+}
+
+
+//This section keeps track of number of screens, increments them, and will increment
+//a counter for up and down arrow as well. Disabled for passive screens of course.
+void inputAction(int input) {
+  if(input == 0) {
     if (currentScreen == 0) {
       currentScreen = numOfScreens-1;
-    } else {
+    }else{
       currentScreen--;
     }
-}
-  
-  else if (buttonStateDown == LOW){
-    lcd.clear();
-    parameters[currentScreen]--;
-}
     
-  else if (buttonStateUp == LOW){
-    lcd.clear();
-    parameters[currentScreen]++;
-}
-
-  else if (buttonStateRight == LOW){
-    lcd.clear();
+  }else if(input == 1) {
     if (currentScreen == numOfScreens-1) {
       currentScreen = 0;
-    } else {
+    }else{
       currentScreen++;
     }
-}
-  
-  printScreen();
-  delay(200);
+  }
+  else if(input == 2) {
+
+    //If you dont want screen to have input at all
+    if (currentScreen != 0 || currentScreen != 1 || currentScreen != 2) {
+    parameterChange(0);
+    }
+  }
+
+  else if(input == 3) {
+    if (currentScreen != 0 || currentScreen != 1 || currentScreen != 2) {
+    parameterChange(1);
+   }
+    else {}
+  }
 }
 
 
+//This section increments user input section when you push up or down arrow
+void parameterChange(int key) {
+  if(key == 0) {
+    parameters[currentScreen]++;
+  }else if(key == 1) {
+    parameters[currentScreen]--;
+  }
+}
+
+
+//This section prints output to LCD
 void printScreen() {
-  if (currentScreen == 3) {
-    lcd.setCursor(0,0);
-    lcd.print(screens[0][0]);
-    lcd.print(": ");
-    lcd.print(parameters[0]);
-    lcd.print(" ");
-    lcd.print(screens[0][1]);
 
-    lcd.setCursor(0,1);
-    lcd.print(screens[1][0]);
-    lcd.print(": ");
-    lcd.print(parameters[1]);
-    lcd.print(" ");
-    lcd.print(screens[1][1]);
+  lcd.clear();
+  lcd.setCursor(1,0);
+  lcd.print(screens[currentScreen][0]);
 
-    lcd.setCursor(0,2);
-    lcd.print(screens[2][0]);
-    lcd.print(": ");
-    lcd.print(parameters[2]);
-    lcd.print(" ");
-    lcd.print(screens[2][1]);
 
-    lcd.setCursor(0,3);
-    lcd.print(screens[3][0]);
-    lcd.print(": ");
-    lcd.print(parameters[3]);
-    lcd.print(" ");
-    lcd.print(screens[3][1]);
+  //This is for the default and passive screens, only display, no input.
+  if (currentScreen == 0 || currentScreen == 1 || currentScreen == 2){
+  lcd.setCursor(0,1);
+  lcd.print(screens[currentScreen][1]);
+  lcd.print(" ");
+  lcd.print(testVar);
+  lcd.setCursor(0,2);
+  lcd.print(screens[currentScreen][2]);
+  lcd.print(" ");
+  lcd.print(testVar);
+  lcd.setCursor(0,3);
+  lcd.print(screens[currentScreen][3]);
+  lcd.print(" ");
+  lcd.print(testVar);
+
   }
-  else {
-    lcd.setCursor(0,0);
-    lcd.print("MENU TOTORIAL");
-    lcd.setCursor(0,2);
-    lcd.print(screens[currentScreen][0]);
-    lcd.setCursor(0,3);
-    lcd.print(parameters[currentScreen]);
-    lcd.print(" ");
-    lcd.print(screens[currentScreen][1]);
+
+  //Allow the up and down button to input values for "parameters" array.
+  else if (currentScreen > 2){
+  lcd.setCursor(0,1);
+  lcd.print(parameters[currentScreen]);
+  lcd.print(" ");
+  lcd.print(screens[currentScreen][1]);
   }
+
+
+  
+
+  
+  
 }
+
+
+//This section is for Alerts. It will print seperately of button logic.
+void printAlert() {
+
+  if (alertCounter = 1){
+  lcd.clear();
+  lcd.setCursor(0,0);
+  lcd.print("Alert! check device!");
+  lcd.setCursor(0,1);
+  lcd.print("Temp too high!");
+  lcd.setCursor(0,2);
+  lcd.print("temp is: ");
+  lcd.setCursor(11,2);
+  lcd.print(testVar);
+  }
+  
+  else if (alertCounter = 2){
+  lcd.clear();
+  lcd.setCursor(0,0);
+  lcd.print("Alert! check device!");
+  lcd.setCursor(0,1);
+  lcd.print("Temp too low!");
+  lcd.setCursor(0,2);
+  lcd.print("temp is: ");
+  lcd.setCursor(11,2);
+  lcd.print(testVar);
+  }
+
+  delay(10000);
+  lcd.clear();
+  printScreen();
+
+}
+
+
+//To-do
+//Make increments 5F for temp
+//Come up with more advanced things to display, ex: average light last 12 hours, when last watered
+//Integrade a timeout so screen 0 will be shown after an amount of time
+//Convert profiles from a 0,1,2 into LOW,MED,HIGH for print output ONLY
+//Integrate sensor function calls into main print output for LCD
+//User Alerts needs real data and needs a trigger so we can test it
+//Add second alerts page verifying communication (text sent)?
+//RF transmit
+//EEPROM storage
+
+
+//Alert function will be called from monitoring code (sensor),
+// In alert function it will write screen and wake up photon board and send text
+// The after a delay, screen 1 will be redrawn.
+// Alert functionality will not be in normal button screen logic.
+
+
+
+//--LCD End--//
+
+  
