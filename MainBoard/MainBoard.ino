@@ -1,27 +1,59 @@
 //---------------Begin Includes------------------------------------//
 #include <dht_nonblocking.h>
-
+#include "LiquidCrystal_I2C.h"
 
 //---------------Begin Global Variables-----------------------------//
 
-//Moisture sensor below
 const uint8_t SOIL_PIN = A2; // set signal pin to analog (any analog pin works)
 const uint8_t SOIL_PWR_PIN = 3; // sensor powered through digital pin to reduce corrosion (any digital pin works)
 const uint8_t LDR_1_PIN = A0;
 const uint8_t LDR_2_PIN = A1;
 const uint8_t DHT_SENSOR_PIN = 2;
+const uint32_t MONITOR_INTERVAL = 300000; // 5min -- monitor interval in milliseconds
+const uint8_t MAX_NUM_LIGHT_MEASUREMENTS = 143; //Should work out to be an average over 12hrs
+
+struct soilSensorBounds
+{
+  const uint16_t MIN_LOWER = 1; //1-300
+  const uint16_t MIN_UPPER = 300; 
+  const uint16_t MED_LOWER = 301; //301-600
+  const uint16_t MED_UPPER = 600; 
+  const uint16_t MAX_LOWER = 601; //601-1000
+  const uint16_t MAX_UPPER = 1000; 
+}SOIL_PARAM;
+
+struct lightSensorBounds
+{
+  const uint16_t MIN_LOWER = 1; //1-85
+  const uint16_t MIN_UPPER = 85; 
+  const uint16_t MED_LOWER = 86; //86-170
+  const uint16_t MED_UPPER = 170; 
+  const uint16_t MAX_LOWER = 171; //171-255
+  const uint16_t MAX_UPPER = 255; 
+}LIGHT_PARAM;
+
+/*struct temperatureSensorBounds
+{
+  uint8_t MIN = 12; //default temp in C
+  uint8_t MAX = 26; //default temp in C
+}TEMPERATURE_PARAM;*/
+
+unsigned long lastMeasurement = 0;
+uint8_t numOfLightMeasurements = 0;
+uint16_t sumOfLightReadings = 0;
 
 
 
 #define DHT_SENSOR_TYPE DHT_TYPE_11
 DHT_nonblocking dht_sensor( DHT_SENSOR_PIN, DHT_SENSOR_TYPE );
+
+
 #include "functions.h"//This is included here seperatly so that the gobals defined above can be used in the functions.h
 
 
 
 
 //LCD code below
-#include "LiquidCrystal_I2C.h"
 LiquidCrystal_I2C lcd(0x27, 16, 4);
 
 const int buttonPinLeft = 5;
@@ -71,7 +103,75 @@ void setup()
 
 
 void loop() {
-  
+  //Begin sensor monitoring code
+
+  //Only measure sensors at set intervals
+  if((millis() - lastMeasurement) >= MONITOR_INTERVAL)
+  {
+    uint8_t usrTempMin = 12;
+    uint8_t usrTempMax = 26;
+    //uint8_t usrRange = 0;
+    
+    //Get sensor readings
+    uint16_t moistureReading = readSoil();
+    uint8_t lightReading = getLightReading();
+    uint8_t temperatureReading = 0;//Holder until temerature function is written
+    bool tankLevel = 1; //Holder until water level function is written
+    
+    //Check moisture sensor
+    switch(getUsrSetting())
+    {
+      case 1:
+        if(moistureReading < SOIL_PARAM.MIN_LOWER)
+        {
+          //Water plant
+        }
+        else if(moistureReading > SOIL_PARAM.MIN_UPPER)
+        {
+          //Send alert
+        }
+        break;
+      case 2:
+        if(moistureReading < SOIL_PARAM.MED_LOWER)
+        {
+          //Water plant
+        }
+        else if(moistureReading > SOIL_PARAM.MED_UPPER)
+        {
+          //Send alert
+        }
+        break;
+      case 3:
+        if(moistureReading < SOIL_PARAM.MAX_LOWER)
+        {
+          //Water plant
+        }
+        else if(moistureReading > SOIL_PARAM.MAX_UPPER)
+        {
+          //Send alert
+        }
+        break;
+    }
+
+    //Check light sensor
+
+    //If we havn't gatherd all the readings, gather another reading
+    if(numOfLightMeasurements < MAX_NUM_LIGHT_MEASUREMENTS)
+    {
+      sumOfLightReadings += getLightReading();
+      numOfLightMeasurements++;
+    }
+    else
+    {
+      
+    }
+    
+    
+    
+    lastMeasurement = millis();
+  }
+  //End sensor monitoring code
+ 
   //This is LCD code below
   buttonStateLeft = digitalRead(buttonPinLeft);
   buttonStateDown = digitalRead(buttonPinDown);

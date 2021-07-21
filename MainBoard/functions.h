@@ -120,3 +120,19 @@ void readTemp()
     return temperature;
   }
 }
+
+
+
+
+
+/*
+ * Description: Temporary function, does nothing atm. Holder until the
+ *  settings funtion is written
+ *  
+ *  
+ *  
+ */
+ int getUsrSetting()
+ {
+  
+ }
