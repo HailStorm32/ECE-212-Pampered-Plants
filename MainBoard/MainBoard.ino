@@ -14,6 +14,7 @@ const uint8_t PHOTON_WK_PIN = 9;
 const uint32_t MONITOR_INTERVAL = 300000; // 5min -- monitor interval in milliseconds
 const uint8_t MAX_NUM_LIGHT_MEASUREMENTS = 143; //Should work out to be an average over 12hrs
 const uint8_t PHOTON_I2C_ADDR = 8;
+const uint8_t WATER_PUMP_SIGNAL_PIN = 1;
 
 struct soilSensorBounds
 {
@@ -101,6 +102,9 @@ void setup()
 //Photon board related pin setup
   pinMode(PHOTON_WK_PIN, OUTPUT);
   digitalWrite(PHOTON_WK_PIN, LOW);
+	
+//--WATER PUMP--//
+pinMode(WATER_PUMP_SIGNAL_PIN, OUTPUT);
 
 
 //--LCD--//
