@@ -207,9 +207,9 @@ int readSoil()
   int pumpWater(int halfCupOfWater){
     
     for(int i = 0; i < halfCupOfWater; i++){
-    digitalWrite(2, HIGH);                      
+    digitalWrite(WATER_PUMP_SIGNAL_PIN, HIGH);                      
     delay(5000);                             
-    digitalWrite(2, LOW);
+    digitalWrite(WATER_PUMP_SIGNAL_PIN, LOW);
     delay(10000);
     }
   }
