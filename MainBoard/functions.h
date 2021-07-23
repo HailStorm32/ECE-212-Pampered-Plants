@@ -251,7 +251,7 @@ void readTemp()
 
 
  /*
-  * Description: Responsiable for sending an alert to the LCD screen
+  * Description: Responsible for sending an alert to the LCD screen
   *   and triggering the Phonton board to send a text
   *   
   * Arguments:
@@ -291,25 +291,120 @@ void readTemp()
       case 0:
         lcd.clear();
         lcd.setCursor(0,0);
-        lcd.print("Alert! check device!");
+        lcd.print("Error! Code failed!");
         lcd.setCursor(0,1);
-        lcd.print("Temp too high!");
-        lcd.setCursor(0,2);
-        lcd.print("temp is: ");
-        lcd.setCursor(11,2);
-        lcd.print(testVar);
         break;
        case 1:
         lcd.clear();
         lcd.setCursor(0,0);
-        lcd.print("Alert! check device!");
+        lcd.print("      Alert!      ");
         lcd.setCursor(0,1);
-        lcd.print("Temp too high!");
+        lcd.print("Water Tank Low!");
         lcd.setCursor(0,2);
-        lcd.print("temp is: ");
-        lcd.setCursor(11,2);
+        lcd.print("Please refill");
+        break;  
+       case 2:
+        lcd.clear();
+        lcd.setCursor(0,0);
+        lcd.print("      Alert!      ");
+        lcd.setCursor(0,1);
+        lcd.print("Temp is too low!");
+        lcd.setCursor(0,2);
+        lcd.print("temp is:   F");
+        lcd.setCursor(9,2);
         lcd.print(testVar);
-        break;        
+        break;
+       case 3:
+        lcd.clear();
+        lcd.setCursor(0,0);
+        lcd.print("      Alert!      ");
+        lcd.setCursor(0,1);
+        lcd.print("Temp is too high!");
+        lcd.setCursor(0,2);
+        lcd.print("temp is:   F");
+        lcd.setCursor(9,2);
+        lcd.print(testVar);
+        break; 
+       case 4:
+        lcd.clear();
+        lcd.setCursor(0,0);
+        lcd.print("      Alert!      ");
+        lcd.setCursor(0,1);
+        lcd.print("Avg light for 12hrs");
+        lcd.setCursor(0,2);
+        lcd.print("is out of bounds!");
+        lcd.setCursor(0,3);
+        lcd.print("Set bounds is:");
+
+        switch(getUsrSetting())
+        {
+          case 1:
+            lcd.setCursor(15,3);
+            lcd.print("low");
+            break;
+          case 2:
+            lcd.setCursor(15,3);
+            lcd.print("med");
+            break;
+          case 3:
+            lcd.setCursor(15,3);
+            lcd.print("high");
+            break;
+        }
+        break;   
+       case 5:
+        lcd.clear();
+        lcd.setCursor(0,0);
+        lcd.print("      Alert!      ");
+        lcd.setCursor(0,1);
+        lcd.print("Soil is too wet!");
+        lcd.setCursor(0,2);
+        lcd.print(" ");
+        lcd.setCursor(0,3);
+        lcd.print("Set bounds is:");
+
+        switch(getUsrSetting())
+        {
+          case 1:
+            lcd.setCursor(15,3);
+            lcd.print("low");
+            break;
+          case 2:
+            lcd.setCursor(15,3);
+            lcd.print("med");
+            break;
+          case 3:
+            lcd.setCursor(15,3);
+            lcd.print("high");
+            break;
+        }
+       case 6:
+        lcd.clear();
+        lcd.setCursor(0,0);
+        lcd.print("      Alert!      ");
+        lcd.setCursor(0,1);
+        lcd.print("Soil is too dry!");
+        lcd.setCursor(0,2);
+        lcd.print(" ");
+        lcd.setCursor(0,3);
+        lcd.print("Set bounds is:");
+
+        switch(getUsrSetting())
+        {
+          case 1:
+            lcd.setCursor(15,3);
+            lcd.print("low");
+            break;
+          case 2:
+            lcd.setCursor(15,3);
+            lcd.print("med");
+            break;
+          case 3:
+            lcd.setCursor(15,3);
+            lcd.print("high");
+            break;
+        }
+        break;                  
     }
     
     delay(10000);

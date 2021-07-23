@@ -159,7 +159,7 @@ void loop() {
     //Check water tank level
     if(tankLevel == 0)
     {
-      //Send alert
+      sendAlert(true, 1);
     }
     
     //Check moisture sensor
@@ -172,7 +172,7 @@ void loop() {
         }
         else if(moistureReading > SOIL_PARAM.MIN_UPPER)
         {
-          //Send alert
+          sendAlert(true, 5);
         }
         break;
       case 2:
@@ -182,7 +182,7 @@ void loop() {
         }
         else if(moistureReading > SOIL_PARAM.MED_UPPER)
         {
-          //Send alert
+          sendAlert(true, 5);
         }
         break;
       case 3:
@@ -192,7 +192,7 @@ void loop() {
         }
         else if(moistureReading > SOIL_PARAM.MAX_UPPER)
         {
-          //Send alert
+          sendAlert(true, 5);
         }
         break;
     }
@@ -215,19 +215,19 @@ void loop() {
         case 1:
           if(lightAvg < LIGHT_PARAM.MIN_LOWER || lightAvg > LIGHT_PARAM.MIN_UPPER)
           {
-            //Send alert
+            sendAlert(false, 4);
           }
           break;
         case 2:
           if(lightAvg < LIGHT_PARAM.MED_LOWER || lightAvg > LIGHT_PARAM.MED_UPPER)
           {
-            //Send alert
+            sendAlert(false, 4);
           }
           break;
         case 3:
           if(lightAvg < LIGHT_PARAM.MAX_LOWER || lightAvg > LIGHT_PARAM.MAX_UPPER)
           {
-            //Send alert
+            sendAlert(false, 4);
           }
           break;
       }
@@ -240,9 +240,13 @@ void loop() {
     //Check temperature
     getUsrSetting(&usrTempMin, &usrTempMax);
 
-    if(temperatureReading < usrTempMin || temperatureReading > usrTempMax)
+    if(temperatureReading < usrTempMin)
     {
-      //Send alert
+      sendAlert(true, 2);
+    }
+    else if(temperatureReading > usrTempMax)
+    {
+      sendAlert(true, 3);
     }
     
     
