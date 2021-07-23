@@ -195,6 +195,25 @@ int readSoil()
   return moisture; //send value
 }
 
+/*
+ * Description: Pumps a number of half-cups of water with delays of 10 seconds in between pumps.  
+ * 
+ * Arguments:
+ *   int halfCupOfWater
+ *   
+ * Return:
+ *   none
+ */
+  int pumpWater(int halfCupOfWater){
+    
+    for(int i = 0; i < halfCupOfWater; i++){
+    digitalWrite(2, HIGH);                      
+    delay(5000);                             
+    digitalWrite(2, LOW);
+    delay(10000);
+    }
+  }
+
 
 /*
  * Description: returns temperature and value from DHT sensor
