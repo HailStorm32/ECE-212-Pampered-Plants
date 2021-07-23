@@ -195,15 +195,43 @@ int readSoil()
   return moisture; //send value
 }
 
+/*
+ * Description: Pumps a number of half-cups of water with delays of 10 seconds in between pumps.  
+ * 
+ * Arguments:
+ *   int halfCupOfWater
+ *   
+ * Return:
+ *   none
+ */
+  int pumpWater(int halfCupOfWater){
+    
+    for(int i = 0; i < halfCupOfWater; i++){
+    digitalWrite(WATER_PUMP_SIGNAL_PIN, HIGH);                      
+    delay(5000);                             
+    digitalWrite(WATER_PUMP_SIGNAL_PIN, LOW);
+    delay(10000);
+    }
+  }
+
 
 /*
- * Description: returns temperature value from DHT sensor
+ * Description: returns temperature and value from DHT sensor
+ *
+ * Instructions for function:
+ * 
+ *     float *temp_var*;   
+ *     float *humidity_var*;
+ *     if(measure_environment( &*temp_var*, &*humidity_var*) == true)
+ *        {...}
+ *     var temperature and humidity will have measurement values stored in them
+ *     temp in deg Celsius, humidity in %
  *
  * Arguments:
  *
  *
  * Return:
- * int (units are in degrees Celsius)
+ * float temperature, float humidity
  */
 static bool measure_environment( float *temperature, float *humidity )
 {
@@ -220,17 +248,7 @@ static bool measure_environment( float *temperature, float *humidity )
   return( false );
 }
 
-void readTemp()
-{
-  float temperature;
-  float humidity;
-  /* Measure temperature and humidity.  If the functions returns
-     true, then a measurement is available. */
-  if( measure_environment( &temperature, &humidity ) == true )
-  {
-    return temperature;
-  }
-}
+
 
 
 
