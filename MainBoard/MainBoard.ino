@@ -151,14 +151,15 @@ void loop() {
   {
     uint8_t usrTempMin = 12;
     uint8_t usrTempMax = 26;
-    //uint8_t usrRange = 0;
     
     //Get sensor readings
     uint16_t moistureReading = readSoil();
     uint8_t lightReading = getLightReading();
-    uint8_t temperatureReading = 0;//Holder until temerature function is written
+    float temperatureReading = 0;
     bool tankLevel = 1; //Holder until water level function is written
 
+    measureEnvironment(&temperatureReading);
+    
    
     //Check water tank level
     if(tankLevel == 0)
@@ -172,7 +173,7 @@ void loop() {
       case 1:
         if(moistureReading < SOIL_PARAM.MIN_LOWER)
         {
-          //Water plant
+          pumpWater(getUsrSetting());
         }
         else if(moistureReading > SOIL_PARAM.MIN_UPPER)
         {
@@ -182,7 +183,7 @@ void loop() {
       case 2:
         if(moistureReading < SOIL_PARAM.MED_LOWER)
         {
-          //Water plant
+          pumpWater(getUsrSetting());
         }
         else if(moistureReading > SOIL_PARAM.MED_UPPER)
         {
@@ -192,7 +193,7 @@ void loop() {
       case 3:
         if(moistureReading < SOIL_PARAM.MAX_LOWER)
         {
-          //Water plant
+          pumpWater(getUsrSetting());
         }
         else if(moistureReading > SOIL_PARAM.MAX_UPPER)
         {

@@ -204,7 +204,7 @@ int readSoil()
  * Return:
  *   none
  */
-  int pumpWater(int halfCupOfWater){
+void pumpWater(int halfCupOfWater){
     
     for(int i = 0; i < halfCupOfWater; i++){
     digitalWrite(WATER_PUMP_SIGNAL_PIN, HIGH);                      
@@ -233,7 +233,7 @@ int readSoil()
  * Return:
  * float temperature, float humidity
  */
-static bool measure_environment( float *temperature, float *humidity )
+static bool measureEnvironment( float *temperature, float *humidity = NULL )
 {
   static unsigned long measurement_timestamp = millis( );
   /* Measure once every four seconds. */
@@ -288,6 +288,8 @@ static bool measure_environment( float *temperature, float *humidity )
   */
   void sendAlert(bool sendText, uint8_t alertType)
   {
+    float temperatureF = 0;
+    
     if(sendText)
     {
       //Wakeup the photon
@@ -322,6 +324,9 @@ static bool measure_environment( float *temperature, float *humidity )
         lcd.print("Please refill");
         break;  
        case 2:
+        measureEnvironment(&temperatureF);
+        temperatureF = ((temperatureF + 1.8) + 32);
+        
         lcd.clear();
         lcd.setCursor(0,0);
         lcd.print("      Alert!      ");
@@ -330,9 +335,12 @@ static bool measure_environment( float *temperature, float *humidity )
         lcd.setCursor(0,2);
         lcd.print("temp is:   F");
         lcd.setCursor(9,2);
-        lcd.print(testVar);
+        lcd.print((uint8_t)temperatureF);
         break;
        case 3:
+        measureEnvironment(&temperatureF);
+        temperatureF = ((temperatureF + 1.8) + 32);
+        
         lcd.clear();
         lcd.setCursor(0,0);
         lcd.print("      Alert!      ");
@@ -341,7 +349,7 @@ static bool measure_environment( float *temperature, float *humidity )
         lcd.setCursor(0,2);
         lcd.print("temp is:   F");
         lcd.setCursor(9,2);
-        lcd.print(testVar);
+        lcd.print((uint8_t)temperatureF);
         break; 
        case 4:
         lcd.clear();
