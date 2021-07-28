@@ -127,8 +127,10 @@ void setInputFlags() {
 void parameterChange(int key) {
   if(key == 0) {
     parameters[currentScreen]++;
+    paramsDataUpdated = true;
   }else if(key == 1) {
     parameters[currentScreen]--;
+    paramsDataUpdated = true;
   }
 }
 
