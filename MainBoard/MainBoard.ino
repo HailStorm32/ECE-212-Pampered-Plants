@@ -2,6 +2,7 @@
 #include <dht_nonblocking.h>
 #include "LiquidCrystal_I2C.h"
 #include "Wire.h"
+#include <EEPROM.h>
 
 
 //---------------Begin Global Variables----------------------------//
@@ -15,6 +16,15 @@ const uint32_t MONITOR_INTERVAL = 300000; // 5min -- monitor interval in millise
 const uint8_t MAX_NUM_LIGHT_MEASUREMENTS = 143; //Should work out to be an average over 12hrs
 const uint8_t PHOTON_I2C_ADDR = 8;
 const uint8_t WATER_PUMP_SIGNAL_PIN = 1;
+
+struct eepromAddresses
+{
+  const uint16_t TEMP_MIN_ADDR = 0;
+  const uint16_t TEMP_MAX_ADDR = 1;
+  const uint16_t SOIL_CAT_ADDR = 2;
+  const uint16_t LIGHT_CAT_ADDR = 3;
+  const uint16_t WATER_AMOUNT_ADDR = 4;
+}UNO_EEPROM;
 
 struct soilSensorBounds
 {
@@ -168,12 +178,12 @@ void loop() {
     }
     
     //Check moisture sensor
-    switch(getUsrSetting())
+    switch(getUsrSetting(2))
     {
       case 1:
         if(moistureReading < SOIL_PARAM.MIN_LOWER)
         {
-          pumpWater(getUsrSetting());
+          pumpWater(getUsrSetting(4));
         }
         else if(moistureReading > SOIL_PARAM.MIN_UPPER)
         {
@@ -183,7 +193,7 @@ void loop() {
       case 2:
         if(moistureReading < SOIL_PARAM.MED_LOWER)
         {
-          pumpWater(getUsrSetting());
+          pumpWater(getUsrSetting(4));
         }
         else if(moistureReading > SOIL_PARAM.MED_UPPER)
         {
@@ -193,7 +203,7 @@ void loop() {
       case 3:
         if(moistureReading < SOIL_PARAM.MAX_LOWER)
         {
-          pumpWater(getUsrSetting());
+          pumpWater(getUsrSetting(4));
         }
         else if(moistureReading > SOIL_PARAM.MAX_UPPER)
         {
@@ -215,7 +225,7 @@ void loop() {
     {
       lightAvg = (sumOfLightReadings/MAX_NUM_LIGHT_MEASUREMENTS);
 
-      switch(getUsrSetting())
+      switch(getUsrSetting(3))
       {
         case 1:
           if(lightAvg < LIGHT_PARAM.MIN_LOWER || lightAvg > LIGHT_PARAM.MIN_UPPER)
@@ -243,7 +253,7 @@ void loop() {
     }
 
     //Check temperature
-    getUsrSetting(&usrTempMin, &usrTempMax);
+    getUsrSetting(1, &usrTempMin, &usrTempMax);
 
     if(temperatureReading < usrTempMin)
     {
@@ -262,6 +272,9 @@ void loop() {
   //--LCD--//
   setInputFlags();
   resolveInputFlags();
+
+  //Begin storing user settings code
+  
 }
 
 

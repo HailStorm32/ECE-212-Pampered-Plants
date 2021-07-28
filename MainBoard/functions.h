@@ -250,20 +250,91 @@ static bool measureEnvironment( float *temperature, float *humidity = NULL )
 
 
 
+/*
+ * Description: Take user setting data and store it in the
+ *  Uno's EEPROM
+ *  
+ * Arguments:
+ *  (INPUT) dataType -- byte that corasponds to the data you want store
+ *      0 - temperature min
+ *      1 - temerature max
+ *      2 - soil moisture category
+ *      3 - light 12 hr avg category
+ *      4 - amount of half cups per watering
+ *  (INPUT) data -- data you wish to store
+ *  
+ * Returns:
+ *  none
+ */
+ void storeUsrSettings(uint8_t dataType, uint8_t data)
+ {
+  switch(dataType)
+  {
+    case 0:
+      EEPROM.put(UNO_EEPROM.TEMP_MIN_ADDR, data);
+      break;
+    case 1:
+      EEPROM.put(UNO_EEPROM.TEMP_MAX_ADDR, data);
+      break;
+    case 2:
+      EEPROM.put(UNO_EEPROM.SOIL_CAT_ADDR, data);
+      break;
+    case 3:
+      EEPROM.put(UNO_EEPROM.LIGHT_CAT_ADDR, data);
+      break;
+    case 4:
+      EEPROM.put(UNO_EEPROM.WATER_AMOUNT_ADDR, data);
+      break;
+  }
+ }
+
 
 
 
 
 /*
- * Description: Temporary function, does nothing atm. Holder until the
- *  settings funtion is written
+ * Description: Retrieve the specified value from EEPROM
  *  
+ * Arguments:
+ *  (INPUT) data2Retrieve -- byte that corasponds to the data you want retrieve
+ *      1 - temerature min and max
+ *      2 - soil moisture category
+ *      3 - light 12 hr avg category
+ *      4 - amount of half cups per watering   
+ *  (OUTPUT) usrTempMin -- pointer to variable that will contain the user set min temp
+ *  (OUTPUT) usrTempMax -- pointer to variable that will contain the user set max temp
  *  
- *  
+ * Return:
+ *  uint8_t -- byte corresponding to a setting category
+ *    0 - no category to return
+ *    1 - minimum category
+ *    2 - medium category
+ *    3 - maximum category
  */
- int getUsrSetting(uint8_t* usrTempMin = NULL, uint8_t* usrTempMax = NULL)
- {
-  
+  uint8_t getUsrSetting(uint8_t data2Retrieve, uint8_t* usrTempMin = NULL, uint8_t* usrTempMax = NULL)
+  {
+    uint8_t data = 0;
+    
+    switch(data2Retrieve)
+    {
+      case 1:
+        EEPROM.get(UNO_EEPROM.TEMP_MIN_ADDR, usrTempMin);
+        EEPROM.get(UNO_EEPROM.TEMP_MAX_ADDR, usrTempMax);
+        break;
+      case 2:
+        EEPROM.put(UNO_EEPROM.SOIL_CAT_ADDR, data);
+        return data;
+        break;
+      case 3:
+        EEPROM.put(UNO_EEPROM.LIGHT_CAT_ADDR, data);
+        return data;
+        break;
+      case 4:
+        EEPROM.put(UNO_EEPROM.WATER_AMOUNT_ADDR, data);
+        return data;
+        break;
+    }
+    return 0;
  }
 
 
@@ -283,8 +354,8 @@ static bool measureEnvironment( float *temperature, float *humidity = NULL )
   *     5 - dirt too wet
   *     6 - dirt too dry
   *   
-  * Return:
-  *   void
+  * Returns:
+  *   none
   */
   void sendAlert(bool sendText, uint8_t alertType)
   {
@@ -362,7 +433,7 @@ static bool measureEnvironment( float *temperature, float *humidity = NULL )
         lcd.setCursor(0,3);
         lcd.print("Set bounds is:");
 
-        switch(getUsrSetting())
+        switch(getUsrSetting(3))
         {
           case 1:
             lcd.setCursor(15,3);
@@ -389,7 +460,7 @@ static bool measureEnvironment( float *temperature, float *humidity = NULL )
         lcd.setCursor(0,3);
         lcd.print("Set bounds is:");
 
-        switch(getUsrSetting())
+        switch(getUsrSetting(2))
         {
           case 1:
             lcd.setCursor(15,3);
@@ -415,7 +486,7 @@ static bool measureEnvironment( float *temperature, float *humidity = NULL )
         lcd.setCursor(0,3);
         lcd.print("Set bounds is:");
 
-        switch(getUsrSetting())
+        switch(getUsrSetting(2))
         {
           case 1:
             lcd.setCursor(15,3);
