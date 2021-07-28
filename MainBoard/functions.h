@@ -355,19 +355,19 @@ static bool measureEnvironment( float *temperature, float *humidity = NULL )
     switch(data2Retrieve)
     {
       case 1:
-        EEPROM.get(UNO_EEPROM.TEMP_MIN_ADDR, usrTempMin);
-        EEPROM.get(UNO_EEPROM.TEMP_MAX_ADDR, usrTempMax);
+        EEPROM.get(UNO_EEPROM.TEMP_MIN_ADDR, *usrTempMin);
+        EEPROM.get(UNO_EEPROM.TEMP_MAX_ADDR, *usrTempMax);
         break;
       case 2:
-        EEPROM.put(UNO_EEPROM.SOIL_CAT_ADDR, data);
+        EEPROM.get(UNO_EEPROM.SOIL_CAT_ADDR, data);
         return data;
         break;
       case 3:
-        EEPROM.put(UNO_EEPROM.LIGHT_CAT_ADDR, data);
+        EEPROM.get(UNO_EEPROM.LIGHT_CAT_ADDR, data);
         return data;
         break;
       case 4:
-        EEPROM.put(UNO_EEPROM.WATER_AMOUNT_ADDR, data);
+        EEPROM.get(UNO_EEPROM.WATER_AMOUNT_ADDR, data);
         return data;
         break;
     }
