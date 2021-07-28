@@ -37,12 +37,14 @@
 //This section prints output to LCD
 void printScreen() {
 
+  //This prints the header of the screen like "Sensor Status" at the top.
   lcd.clear();
   lcd.setCursor(1,0);
   lcd.print(screens[currentScreen][0]);
 
 
   //This is for the default and passive screens, only display, no input.
+  //This displays the 3 passive values below the header.
   if (currentScreen == 0 || currentScreen == 1 || currentScreen == 2){
   lcd.setCursor(0,1);
   lcd.print(screens[currentScreen][1]);
@@ -56,16 +58,49 @@ void printScreen() {
   lcd.print(screens[currentScreen][3]);
   lcd.print(" ");
   lcd.print(testVar);
-
   }
 
-  //Allow the up and down button to input values for "parameters" array.
-  else if (currentScreen > 2){
+  
+  //Allow the up and down button to input values for "parameters" array. In units of 5 deg F for min and max temp screens.
+  else if (currentScreen == 3 || currentScreen == 4){
+  lcd.setCursor(0,1);
+  lcd.print(parameters[currentScreen] * 5);
+  lcd.print(" ");
+  lcd.print(screens[currentScreen][1]);
+  }
+
+
+  //Allow the up and down button to input values for "parameters" array. In increments of LOW,MED,HIGH for water and light profiles.
+  else if (currentScreen == 5 || currentScreen == 6){
+  lcd.setCursor(0,1);
+  if (parameters[currentScreen] == 0)
+    {lcd.print("LOW");
+    }
+  else if (parameters[currentScreen] == 1)
+    {lcd.print("MEDIUM");
+    }
+  else if (parameters[currentScreen] == 2)
+    {lcd.print("HIGH");
+    }
+  else if (parameters[currentScreen] < 0)
+    {lcd.print(parameters[currentScreen]);
+    }
+  else if (parameters[currentScreen] >2)
+    {lcd.print(parameters[currentScreen]);
+    }
+  lcd.print(" ");
+  lcd.print(screens[currentScreen][1]);
+  }
+
+  
+  //Allow the up and down button to input values for "parameters" array. Just increments of one half-cups screen and any additional screens.
+  else if (currentScreen == 7 || currentScreen > 7){
   lcd.setCursor(0,1);
   lcd.print(parameters[currentScreen]);
   lcd.print(" ");
   lcd.print(screens[currentScreen][1]);
   }
+  
 }
 
 //This is for the button pressing and debounce. Measures time and
