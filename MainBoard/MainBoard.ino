@@ -56,6 +56,7 @@ unsigned long lastMeasurement = 0;
 uint8_t numOfLightMeasurements = 0;
 uint16_t sumOfLightReadings = 0;
 uint8_t lightAvg = 0;
+bool paramsDataUpdated = false;
 
 
 
@@ -274,7 +275,21 @@ void loop() {
   resolveInputFlags();
 
   //Begin storing user settings code
-  
+  if(paramsDataUpdated)
+  {
+    for(uint8_t indx = 0; indx < 5; indx++)
+    {
+      storeUsrSettings(indx, parameters[indx+3]);
+    }
+    /*storeUsrSettings(0, parameters[3]);//store temerature min data
+    storeUsrSettings(1, parameters[4]);//store temerature min data
+    storeUsrSettings(2, parameters[5]);//store soil moisture profile data
+    storeUsrSettings(3, parameters[6]);//store light profile data
+    storeUsrSettings(4, parameters[7]);//store # of half cups per watering data
+    */
+
+    paramsDataUpdated = false;
+  }
 }
 
 
