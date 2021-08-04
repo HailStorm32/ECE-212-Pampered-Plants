@@ -150,17 +150,17 @@ void pumpWater(int halfCupOfWater){
  */
 static bool measureEnvironment( float *temperature, float *humidity = NULL )
 {
-  static unsigned long measurement_timestamp = millis( );
+ // static unsigned long measurement_timestamp = millis( );
   /* Measure once every four seconds. */
-  if( millis( ) - measurement_timestamp > 3000ul )
-  {
+ // if( millis( ) - measurement_timestamp > 3000ul )
+ // {
     if( dht_sensor.measure( temperature, humidity ) == true )
     {
-      measurement_timestamp = millis( );
+     // measurement_timestamp = millis( );
       return( true );
     }
-  }
-  return( false );
+ // }
+ // return( false );
 }
 
 
@@ -458,6 +458,7 @@ void resolveInputFlags() {
   */
   void sendAlert(bool sendText, uint8_t alertType)
   {
+    float temperatureC = 0;
     float temperatureF = 0;
     
     if(sendText)
@@ -494,8 +495,8 @@ void resolveInputFlags() {
         lcd.print("Please refill");
         break;  
        case 2:
-        measureEnvironment(&temperatureF);
-        temperatureF = ((temperatureF + 1.8) + 32);
+        measureEnvironment(&temperatureC);
+        temperatureF = ((temperatureC + 1.8) + 32);
         
         lcd.clear();
         lcd.setCursor(0,0);
@@ -508,8 +509,8 @@ void resolveInputFlags() {
         lcd.print((uint8_t)temperatureF);
         break;
        case 3:
-        measureEnvironment(&temperatureF);
-        temperatureF = ((temperatureF + 1.8) + 32);
+        measureEnvironment(&temperatureC);
+        temperatureF = ((temperatureC + 1.8) + 32);
         
         lcd.clear();
         lcd.setCursor(0,0);

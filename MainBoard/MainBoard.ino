@@ -162,11 +162,26 @@ pinMode(WATER_PUMP_SIGNAL_PIN, OUTPUT);
 }
 
 
-
+float temperatureReadingTemp = 0;
+float testing = 0;
 
 //This is the loop. This is the heart that let's everything in motion.
 //It is always looping. We love loop.
 void loop() {
+
+   Serial.print("Soil: ");
+   Serial.println(readSoil());
+
+   measureEnvironment(&temperatureReadingTemp);
+   testing = ((temperatureReadingTemp * 1.8) + 32);
+
+   Serial.print("Temp: ");
+   Serial.println(testing);
+
+  
+
+
+  
   //Begin sensor monitoring code
 
   //Only measure sensors at set intervals
