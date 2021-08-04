@@ -34,151 +34,6 @@
 //============================= Functions Begin Below This Line ===================================================
 
 
-//This section prints output to LCD
-void printScreen() {
-
-  //This prints the header of the screen like "Sensor Status" at the top.
-  lcd.clear();
-  lcd.setCursor(1,0);
-  lcd.print(screens[currentScreen][0]);
-
-
-  //This is for the default and passive screens, only display, no input.
-  //This displays the 3 passive values below the header.
-  if (currentScreen == 0 || currentScreen == 1 || currentScreen == 2){
-  lcd.setCursor(0,1);
-  lcd.print(screens[currentScreen][1]);
-  lcd.print(" ");
-  Serial.print(testVar);
-  lcd.print(testVar);
-  lcd.setCursor(0,2);
-  lcd.print(screens[currentScreen][2]);
-  lcd.print(" ");
-  lcd.print(testVar);
-  lcd.setCursor(0,3);
-  lcd.print(screens[currentScreen][3]);
-  lcd.print(" ");
-  lcd.print(testVar);
-  }
-
-  
-  //Allow the up and down button to input values for "parameters" array. In units of 5 deg F for min and max temp screens.
-  else if (currentScreen == 3 || currentScreen == 4){
-  lcd.setCursor(0,1);
-  lcd.print(parameters[currentScreen] * 5);
-  lcd.print(" ");
-  lcd.print(screens[currentScreen][1]);
-  }
-
-
-  //Allow the up and down button to input values for "parameters" array. In increments of LOW,MED,HIGH for water and light profiles.
-  else if (currentScreen == 5 || currentScreen == 6){
-  lcd.setCursor(0,1);
-  if (parameters[currentScreen] == 0)
-    {lcd.print("LOW");
-    }
-  else if (parameters[currentScreen] == 1)
-    {lcd.print("MEDIUM");
-    }
-  else if (parameters[currentScreen] == 2)
-    {lcd.print("HIGH");
-    }
-  else if (parameters[currentScreen] < 0)
-    {lcd.print(parameters[currentScreen]);
-    }
-  else if (parameters[currentScreen] >2)
-    {lcd.print(parameters[currentScreen]);
-    }
-  lcd.print(" ");
-  lcd.print(screens[currentScreen][1]);
-  }
-
-  
-  //Allow the up and down button to input values for "parameters" array. Just increments of one half-cups screen and any additional screens.
-  else if (currentScreen == 7 || currentScreen > 7){
-  lcd.setCursor(0,1);
-  lcd.print(parameters[currentScreen]);
-  lcd.print(" ");
-  lcd.print(screens[currentScreen][1]);
-  }
-  
-}
-
-//This is for the button pressing and debounce. Measures time and
-//makes sure it is only using 1 button press to send
-void setInputFlags() {
-  for(int i = 0; i < NUM_OF_INPUTS; i++) {
-    int reading = digitalRead(INPUT_PINS[i]);
-    if (reading != lastInputState[i]) {
-      lastDebounceTime[i] = millis();
-    }
-    if ((millis() - lastDebounceTime[i]) > debounceDelay) {
-      if (reading != inputState[i]) {
-        inputState[i] = reading;
-        if (inputState[i] == HIGH) {
-          inputFlags[i] = HIGH;
-        }
-      }
-    }
-    lastInputState[i] = reading;
-  }
-}
-
-//This section increments user input section when you push up or down arrow
-void parameterChange(int key) {
-  if(key == 0) {
-    parameters[currentScreen]++;
-    paramsDataUpdated = true;
-  }else if(key == 1) {
-    parameters[currentScreen]--;
-    paramsDataUpdated = true;
-  }
-}
-
-//This section keeps track of number of screens, increments them, and will increment
-//a counter for up and down arrow as well. Disabled for passive screens of course.
-void inputAction(int input) {
-  if(input == 0) {
-    if (currentScreen == 0) {
-      currentScreen = NUM_OF_SCREENS-1;
-    }else{
-      currentScreen--;
-    }
-    
-  }else if(input == 1) {
-    if (currentScreen == NUM_OF_SCREENS-1) {
-      currentScreen = 0;
-    }else{
-      currentScreen++;
-    }
-  }
-  else if(input == 2) {
-
-    //If you dont want screen to have input at all
-    if (currentScreen != 0 || currentScreen != 1 || currentScreen != 2) {
-    parameterChange(0);
-    }
-  }
-
-  else if(input == 3) {
-    if (currentScreen != 0 || currentScreen != 1 || currentScreen != 2) {
-    parameterChange(1);
-   }
-    else {}
-  }
-}
-
-//Resolve kicks off the printScreen function after it senses a button press
-void resolveInputFlags() {
-  for(int i = 0; i < NUM_OF_INPUTS; i++) {
-    if(inputFlags[i] == HIGH) {
-      inputAction(i);
-      inputFlags[i] = LOW;
-      printScreen();
-    }
-  }
-}
-
 
  /*
  * Description: Detects the level of water with a magnetic float and a magnetic switch  
@@ -309,6 +164,151 @@ static bool measureEnvironment( float *temperature, float *humidity = NULL )
 }
 
 
+
+//This section prints output to LCD
+void printScreen() {
+
+  //This prints the header of the screen like "Sensor Status" at the top.
+  lcd.clear();
+  lcd.setCursor(1,0);
+  lcd.print(screens[currentScreen][0]);
+
+
+  //This is for the default and passive screens, only display, no input.
+  //This displays the 3 passive values below the header.
+  if (currentScreen == 0 || currentScreen == 1 || currentScreen == 2){
+  lcd.setCursor(0,1);
+  lcd.print(screens[currentScreen][1]);
+  lcd.print(" ");
+  Serial.print(readSoil());
+  lcd.print(readSoil());
+  lcd.setCursor(0,2);
+  lcd.print(screens[currentScreen][2]);
+  lcd.print(" ");
+  lcd.print(testVar);
+  lcd.setCursor(0,3);
+  lcd.print(screens[currentScreen][3]);
+  lcd.print(" ");
+  lcd.print(testVar);
+  }
+
+  
+  //Allow the up and down button to input values for "parameters" array. In units of 5 deg F for min and max temp screens.
+  else if (currentScreen == 3 || currentScreen == 4){
+  lcd.setCursor(0,1);
+  lcd.print(parameters[currentScreen] * 5);
+  lcd.print(" ");
+  lcd.print(screens[currentScreen][1]);
+  }
+
+
+  //Allow the up and down button to input values for "parameters" array. In increments of LOW,MED,HIGH for water and light profiles.
+  else if (currentScreen == 5 || currentScreen == 6){
+  lcd.setCursor(0,1);
+  if (parameters[currentScreen] == 0)
+    {lcd.print("LOW");
+    }
+  else if (parameters[currentScreen] == 1)
+    {lcd.print("MEDIUM");
+    }
+  else if (parameters[currentScreen] == 2)
+    {lcd.print("HIGH");
+    }
+  else if (parameters[currentScreen] < 0)
+    {lcd.print(parameters[currentScreen]);
+    }
+  else if (parameters[currentScreen] >2)
+    {lcd.print(parameters[currentScreen]);
+    }
+  lcd.print(" ");
+  lcd.print(screens[currentScreen][1]);
+  }
+
+  
+  //Allow the up and down button to input values for "parameters" array. Just increments of one half-cups screen and any additional screens.
+  else if (currentScreen == 7 || currentScreen > 7){
+  lcd.setCursor(0,1);
+  lcd.print(parameters[currentScreen]);
+  lcd.print(" ");
+  lcd.print(screens[currentScreen][1]);
+  }
+  
+}
+
+//This is for the button pressing and debounce. Measures time and
+//makes sure it is only using 1 button press to send
+void setInputFlags() {
+  for(int i = 0; i < NUM_OF_INPUTS; i++) {
+    int reading = digitalRead(INPUT_PINS[i]);
+    if (reading != lastInputState[i]) {
+      lastDebounceTime[i] = millis();
+    }
+    if ((millis() - lastDebounceTime[i]) > debounceDelay) {
+      if (reading != inputState[i]) {
+        inputState[i] = reading;
+        if (inputState[i] == HIGH) {
+          inputFlags[i] = HIGH;
+        }
+      }
+    }
+    lastInputState[i] = reading;
+  }
+}
+
+//This section increments user input section when you push up or down arrow
+void parameterChange(int key) {
+  if(key == 0) {
+    parameters[currentScreen]++;
+    paramsDataUpdated = true;
+  }else if(key == 1) {
+    parameters[currentScreen]--;
+    paramsDataUpdated = true;
+  }
+}
+
+//This section keeps track of number of screens, increments them, and will increment
+//a counter for up and down arrow as well. Disabled for passive screens of course.
+void inputAction(int input) {
+  if(input == 0) {
+    if (currentScreen == 0) {
+      currentScreen = NUM_OF_SCREENS-1;
+    }else{
+      currentScreen--;
+    }
+    
+  }else if(input == 1) {
+    if (currentScreen == NUM_OF_SCREENS-1) {
+      currentScreen = 0;
+    }else{
+      currentScreen++;
+    }
+  }
+  else if(input == 2) {
+
+    //If you dont want screen to have input at all
+    if (currentScreen != 0 || currentScreen != 1 || currentScreen != 2) {
+    parameterChange(0);
+    }
+  }
+
+  else if(input == 3) {
+    if (currentScreen != 0 || currentScreen != 1 || currentScreen != 2) {
+    parameterChange(1);
+   }
+    else {}
+  }
+}
+
+//Resolve kicks off the printScreen function after it senses a button press
+void resolveInputFlags() {
+  for(int i = 0; i < NUM_OF_INPUTS; i++) {
+    if(inputFlags[i] == HIGH) {
+      inputAction(i);
+      inputFlags[i] = LOW;
+      printScreen();
+    }
+  }
+}
 
 /*
  * Description: Take user setting data and store it in the
