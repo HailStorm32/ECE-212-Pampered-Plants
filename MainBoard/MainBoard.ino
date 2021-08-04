@@ -81,6 +81,8 @@ String screens[NUM_OF_SCREENS][5] = {{"Sensor Status 1/3","Temp:","Moisture:","W
 int parameters[NUM_OF_SCREENS];
 
 
+
+
 //Screens array and parameters array are NOT linked together.
 //screens is a variableName[10][2] array, it is a 2D array that has a table of
 // 10 squares and within the squares is 2 values stored.
@@ -101,6 +103,12 @@ LiquidCrystal_I2C lcd(0x27, 20, 4);
 
 void setup() 
 {
+  for(int indx = 0; indx < NUM_OF_SCREENS; indx++)
+  {
+    parameters[indx] = 0;
+  }
+  
+  
   Serial.begin(9600);
 
   Wire.begin();
