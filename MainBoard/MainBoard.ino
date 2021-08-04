@@ -16,6 +16,7 @@ const uint32_t MONITOR_INTERVAL = 300000; // 5min -- monitor interval in millise
 const uint8_t MAX_NUM_LIGHT_MEASUREMENTS = 143; //Should work out to be an average over 12hrs
 const uint8_t PHOTON_I2C_ADDR = 8;
 const uint8_t WATER_PUMP_SIGNAL_PIN = 1;
+const uint8_t WATER_LEVEL = 4; 
 
 struct eepromAddresses
 {
@@ -103,6 +104,9 @@ void setup()
   Serial.begin(9600);
 
   Wire.begin();
+
+// --Water Level Sensor--//
+  pinMode(WATER_LEVEL, INPUT_PULLUP);// Attaches the input of the float sensor to the Arduino internal 10k resistor
 
 //--Moisture Sensor--//
   pinMode(SOIL_PWR_PIN, OUTPUT); 

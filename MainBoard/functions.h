@@ -179,7 +179,28 @@ void resolveInputFlags() {
 }
 
 
-
+ /*
+ * Description: Detects the level of water with a magnetic float and a magnetic switch  
+ * 
+ * Arguments:
+ *   none
+ *   
+ * Return:
+ *   bool -- getWaterLevel which is false for water full and true for water Low
+ */              
+bool getWaterLevel();
+ 
+{ 
+    getWaterLevel = digitalRead(WATER_LEVEL); 
+  if (getWaterLevel == false) 
+  { 
+    return (getWaterLevel);  // "WATER LEVEL - HIGH")
+  } 
+  else 
+  { 
+    return (getWaterLevel); // "WATER LEVEL - LOW"
+  } 
+}
 
 
 /*
