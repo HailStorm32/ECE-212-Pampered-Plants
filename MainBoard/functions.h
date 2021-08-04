@@ -49,6 +49,7 @@ void printScreen() {
   lcd.setCursor(0,1);
   lcd.print(screens[currentScreen][1]);
   lcd.print(" ");
+  Serial.print(testVar);
   lcd.print(testVar);
   lcd.setCursor(0,2);
   lcd.print(screens[currentScreen][2]);
@@ -188,17 +189,18 @@ void resolveInputFlags() {
  * Return:
  *   bool -- getWaterLevel which is false for water full and true for water Low
  */              
-bool getWaterLevel();
+bool getWaterLevel()
  
-{ 
-    getWaterLevel = digitalRead(WATER_LEVEL); 
-  if (getWaterLevel == false) 
+{
+    bool waterLevel = false;
+    waterLevel = digitalRead(WATER_LEVEL); 
+  if (waterLevel == false) 
   { 
-    return (getWaterLevel);  // "WATER LEVEL - HIGH")
+    return (waterLevel);  // "WATER LEVEL - HIGH")
   } 
   else 
   { 
-    return (getWaterLevel); // "WATER LEVEL - LOW"
+    return (waterLevel); // "WATER LEVEL - LOW"
   } 
 }
 
