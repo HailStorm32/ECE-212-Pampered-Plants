@@ -405,7 +405,7 @@ static bool measureEnvironment( float *temperature, float *humidity = NULL )
       delay(200);
       digitalWrite(PHOTON_WK_PIN, LOW);
 
-      delay(10000);//Give the photon time to wake up
+      delay(20000);//Give the photon time to wake up
 
       //Send alert type to Photon
       Wire.beginTransmission(PHOTON_I2C_ADDR);
