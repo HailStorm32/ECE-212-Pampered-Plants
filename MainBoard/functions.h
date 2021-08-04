@@ -168,6 +168,11 @@ static bool measureEnvironment( float *temperature, float *humidity = NULL )
 //This section prints output to LCD
 void printScreen() {
 
+
+float temperatureF;
+measureEnvironment(&temperatureF);
+temperatureF = ((temperatureF = 1.8) +32);
+
   //This prints the header of the screen like "Sensor Status" at the top.
   lcd.clear();
   lcd.setCursor(1,0);
@@ -176,12 +181,30 @@ void printScreen() {
 
   //This is for the default and passive screens, only display, no input.
   //This displays the 3 passive values below the header.
-  if (currentScreen == 0 || currentScreen == 1 || currentScreen == 2){
+  if (currentScreen == 0){
   lcd.setCursor(0,1);
   lcd.print(screens[currentScreen][1]);
   lcd.print(" ");
-  Serial.print(readSoil());
+  lcd.print(temperatureF);
+  lcd.setCursor(0,2);
+  lcd.print(screens[currentScreen][2]);
+  lcd.print(" ");
   lcd.print(readSoil());
+  lcd.setCursor(0,3);
+  lcd.print(screens[currentScreen][3]);
+  lcd.print(" ");
+  lcd.print(testVar);
+  }
+
+
+
+  //This is for the default and passive screens, only display, no input.
+  //This displays screen 2 passive values below the header.
+  if (currentScreen == 1){
+  lcd.setCursor(0,1);
+  lcd.print(screens[currentScreen][1]);
+  lcd.print(" ");
+  lcd.print(testVar);
   lcd.setCursor(0,2);
   lcd.print(screens[currentScreen][2]);
   lcd.print(" ");
@@ -192,6 +215,22 @@ void printScreen() {
   lcd.print(testVar);
   }
 
+    //This is for the default and passive screens, only display, no input.
+  //This displays screen 2 passive values below the header.
+  if (currentScreen == 2){
+  lcd.setCursor(0,1);
+  lcd.print(screens[currentScreen][1]);
+  lcd.print(" ");
+  lcd.print(testVar);
+  lcd.setCursor(0,2);
+  lcd.print(screens[currentScreen][2]);
+  lcd.print(" ");
+  lcd.print(testVar);
+  lcd.setCursor(0,3);
+  lcd.print(screens[currentScreen][3]);
+  lcd.print(" ");
+  lcd.print(testVar);
+  }
   
   //Allow the up and down button to input values for "parameters" array. In units of 5 deg F for min and max temp screens.
   else if (currentScreen == 3 || currentScreen == 4){
