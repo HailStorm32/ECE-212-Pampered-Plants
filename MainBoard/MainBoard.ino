@@ -39,12 +39,12 @@ struct soilSensorBounds
 
 struct lightSensorBounds
 {
-  const uint16_t MIN_LOWER = 1; //1-85
-  const uint16_t MIN_UPPER = 85; 
-  const uint16_t MED_LOWER = 86; //86-170
-  const uint16_t MED_UPPER = 170; 
-  const uint16_t MAX_LOWER = 171; //171-255
-  const uint16_t MAX_UPPER = 255; 
+  const uint8_t MIN_LOWER = 1; //1-85
+  const uint8_t MIN_UPPER = 85; 
+  const uint8_t MED_LOWER = 86; //86-170
+  const uint8_t MED_UPPER = 170; 
+  const uint8_t MAX_LOWER = 171; //171-255
+  const uint8_t MAX_UPPER = 255; 
 }LIGHT_PARAM;
 
 /*struct temperatureSensorBounds
@@ -59,7 +59,6 @@ uint16_t sumOfLightReadings = 0;
 uint8_t lightAvg = 0;
 bool paramsDataUpdated = false;
 
-float temperatureF = 0;
 
 
 
@@ -68,7 +67,7 @@ float temperatureF = 0;
 //Input & Button Logic
 const uint8_t NUM_OF_INPUTS = 4;
 const uint8_t INPUT_PINS[NUM_OF_INPUTS] = {5,6,7,8};
-int inputState[NUM_OF_INPUTS];
+bool inputState[NUM_OF_INPUTS];
 bool lastInputState[NUM_OF_INPUTS] = {LOW,LOW,LOW,LOW};
 bool inputFlags[NUM_OF_INPUTS] = {LOW,LOW,LOW,LOW};
 long lastDebounceTime[NUM_OF_INPUTS] = {0,0,0,0};
@@ -164,8 +163,8 @@ pinMode(WATER_PUMP_SIGNAL_PIN, OUTPUT);
 }
 
 
-float temperatureReadingTemp = 0;
-//float temperature = 0;
+//float temperatureReadingTemp = 0;
+//float temperatureT = 0;
 
 //This is the loop. This is the heart that let's everything in motion.
 //It is always looping. We love loop.
@@ -174,11 +173,11 @@ void loop() {
    //Serial.print("Soil: ");
   // Serial.println(readSoil());
 
-   measureEnvironment(&temperatureReadingTemp);
+   /*measureEnvironment(&temperatureReadingTemp);
    temperatureF = ((temperatureReadingTemp * 1.8) + 32);
 
    Serial.print("Temp: ");
-   Serial.println(temperatureF);
+   Serial.println(temperatureF);*/
 
   
 
@@ -189,16 +188,18 @@ void loop() {
   //Only measure sensors at set intervals
   if((millis() - lastMeasurement) >= MONITOR_INTERVAL)
   {
-    uint8_t usrTempMin = 12;
-    uint8_t usrTempMax = 26;
+    uint8_t usrTempMin = 53;
+    uint8_t usrTempMax = 85;
     
     //Get sensor readings
     uint16_t moistureReading = readSoil();
     uint8_t lightReading = getLightReading();
-    float temperatureReading = 0;
+    float temperatureReadingC = 0;
+    float temperatureReadingF = 0;
     bool tankLevel = 1; //Holder until water level function is written
 
-    //measureEnvironment(&temperatureReading);
+    measureEnvironment(&temperatureReadingC);
+    temperatureReadingF = ((temperatureReadingC * 1.8) + 32);
     
    
     //Check water tank level
@@ -285,11 +286,11 @@ void loop() {
     //Check temperature
     getUsrSetting(1, &usrTempMin, &usrTempMax);
 
-    if(temperatureF < usrTempMin)
+    if(temperatureReadingF < usrTempMin)
     {
       sendAlert(true, 2);
     }
-    else if(temperatureF > usrTempMax)
+    else if(temperatureReadingF > usrTempMax)
     {
       sendAlert(true, 3);
     }
@@ -301,7 +302,7 @@ void loop() {
 
   //--LCD--//
   //Run through LCD loop to display values on screen and gather user input
-  setInputFlags();
+  setInputFlags(); 
   resolveInputFlags();
 
   //End LCD code

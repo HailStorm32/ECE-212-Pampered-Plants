@@ -119,9 +119,9 @@ int readSoil()
  * Return:
  *   none
  */
-void pumpWater(int halfCupOfWater){
+void pumpWater(uint8_t halfCupOfWater){
     
-    for(int i = 0; i < halfCupOfWater; i++){
+    for(uint8_t i = 0; i < halfCupOfWater; i++){
     digitalWrite(WATER_PUMP_SIGNAL_PIN, HIGH);                      
     delay(5000);                             
     digitalWrite(WATER_PUMP_SIGNAL_PIN, LOW);
@@ -148,18 +148,28 @@ void pumpWater(int halfCupOfWater){
  * Return:
  * float temperature, float humidity
  */
-static bool measureEnvironment( float *temperature, float *humidity = NULL )
+ bool measureEnvironment( float *temperature, float *humidity = NULL )
 {
- // static unsigned long measurement_timestamp = millis( );
-  /* Measure once every four seconds. */
- // if( millis( ) - measurement_timestamp > 3000ul )
- // {
-    if( dht_sensor.measure( temperature, humidity ) == true )
+  static unsigned long measurement_timestamp = millis( );
+  bool canExit = false;
+  
+  /* Measure once every one second. */
+  while( millis( ) - measurement_timestamp < 1000 )
+  {}
+
+  //only return a value if the measure function has returned true
+  while(!canExit) 
+  {
+    if(dht_sensor.measure( temperature, humidity ) == true)
     {
-     // measurement_timestamp = millis( );
-      return( true );
+      measurement_timestamp = millis( );
+      canExit = true;
     }
- // }
+    else
+    {
+      //Serial.println("FAIL");
+    }
+  }
  // return( false );
 }
 
@@ -168,12 +178,8 @@ static bool measureEnvironment( float *temperature, float *humidity = NULL )
 //This section prints output to LCD
 void printScreen() {
 
-
-//float temperatureF = 0;
-float temperatureC = 0;
-//measureEnvironment(&temperatureC);
-//temperatureF = ((temperatureC * 1.8) +32);
-Serial.println(temperatureF);
+  float temperatureScreenC = 0;
+  float temperatureScreenF = 0;
 
   //This prints the header of the screen like "Sensor Status" at the top.
   lcd.clear();
@@ -181,13 +187,22 @@ Serial.println(temperatureF);
   lcd.print(screens[currentScreen][0]);
 
 
+   measureEnvironment(&temperatureScreenC);
+   temperatureScreenF = ((temperatureScreenC * 1.8) + 32);
+
+
+   //Serial.print("IN: ");
+   //Serial.println(temperatureScreenF);
+   
+
   //This is for the default and passive screens, only display, no input.
   //This displays the 3 passive values below the header.
   if (currentScreen == 0){
   lcd.setCursor(0,1);
   lcd.print(screens[currentScreen][1]);
   lcd.print(" ");
-  lcd.print(temperatureF);
+ 
+  lcd.print(temperatureScreenF);
   lcd.setCursor(0,2);
   lcd.print(screens[currentScreen][2]);
   lcd.print(" ");
@@ -279,8 +294,8 @@ Serial.println(temperatureF);
 //This is for the button pressing and debounce. Measures time and
 //makes sure it is only using 1 button press to send
 void setInputFlags() {
-  for(int i = 0; i < NUM_OF_INPUTS; i++) {
-    int reading = digitalRead(INPUT_PINS[i]);
+  for(uint8_t i = 0; i < NUM_OF_INPUTS; i++) {
+    uint8_t reading = digitalRead(INPUT_PINS[i]);
     if (reading != lastInputState[i]) {
       lastDebounceTime[i] = millis();
     }
@@ -297,7 +312,7 @@ void setInputFlags() {
 }
 
 //This section increments user input section when you push up or down arrow
-void parameterChange(int key) {
+void parameterChange(uint8_t key) {
   if(key == 0) {
     parameters[currentScreen]++;
     paramsDataUpdated = true;
@@ -309,7 +324,7 @@ void parameterChange(int key) {
 
 //This section keeps track of number of screens, increments them, and will increment
 //a counter for up and down arrow as well. Disabled for passive screens of course.
-void inputAction(int input) {
+void inputAction(uint8_t input) {
   if(input == 0) {
     if (currentScreen == 0) {
       currentScreen = NUM_OF_SCREENS-1;
@@ -482,12 +497,14 @@ void resolveInputFlags() {
     switch(alertType)
     {
       case 0:
+        Serial.println("Alert! Case: Error");
         lcd.clear();
         lcd.setCursor(0,0);
         lcd.print("Error! Code failed!");
         lcd.setCursor(0,1);
         break;
        case 1:
+        Serial.println("Alert! Case: Tank Low");
         lcd.clear();
         lcd.setCursor(0,0);
         lcd.print("      Alert!      ");
@@ -497,6 +514,7 @@ void resolveInputFlags() {
         lcd.print("Please refill");
         break;  
        case 2:
+        Serial.println("Alert! Case: Temp Too Low");
         measureEnvironment(&temperatureC);
         temperatureF = ((temperatureC * 1.8) + 32);
         
@@ -511,6 +529,7 @@ void resolveInputFlags() {
         lcd.print((uint8_t)temperatureF);
         break;
        case 3:
+        Serial.println("Alert! Case: Temp Too High");
         measureEnvironment(&temperatureC);
         temperatureF = ((temperatureC * 1.8) + 32);
         
@@ -525,6 +544,7 @@ void resolveInputFlags() {
         lcd.print((uint8_t)temperatureF);
         break; 
        case 4:
+        Serial.println("Alert! Case: Avg Light Bounds Error");
         lcd.clear();
         lcd.setCursor(0,0);
         lcd.print("      Alert!      ");
@@ -552,6 +572,7 @@ void resolveInputFlags() {
         }
         break;   
        case 5:
+        Serial.println("Alert! Case: Soil Too Wet");
         lcd.clear();
         lcd.setCursor(0,0);
         lcd.print("      Alert!      ");
@@ -578,6 +599,7 @@ void resolveInputFlags() {
             break;
         }
        case 6:
+        Serial.println("Alert! Case: Soil Too Dry");
         lcd.clear();
         lcd.setCursor(0,0);
         lcd.print("      Alert!      ");
