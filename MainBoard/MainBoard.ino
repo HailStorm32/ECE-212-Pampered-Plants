@@ -59,6 +59,8 @@ uint16_t sumOfLightReadings = 0;
 uint8_t lightAvg = 0;
 bool paramsDataUpdated = false;
 
+float temperatureF = 0;
+
 
 
 //------------Begin LCD Variables-----------------//
@@ -163,20 +165,20 @@ pinMode(WATER_PUMP_SIGNAL_PIN, OUTPUT);
 
 
 float temperatureReadingTemp = 0;
-float testing = 0;
+//float temperature = 0;
 
 //This is the loop. This is the heart that let's everything in motion.
 //It is always looping. We love loop.
 void loop() {
 
-   Serial.print("Soil: ");
-   Serial.println(readSoil());
+   //Serial.print("Soil: ");
+  // Serial.println(readSoil());
 
    measureEnvironment(&temperatureReadingTemp);
-   testing = ((temperatureReadingTemp * 1.8) + 32);
+   temperatureF = ((temperatureReadingTemp * 1.8) + 32);
 
    Serial.print("Temp: ");
-   Serial.println(testing);
+   Serial.println(temperatureF);
 
   
 
@@ -196,7 +198,7 @@ void loop() {
     float temperatureReading = 0;
     bool tankLevel = 1; //Holder until water level function is written
 
-    measureEnvironment(&temperatureReading);
+    //measureEnvironment(&temperatureReading);
     
    
     //Check water tank level
@@ -283,11 +285,11 @@ void loop() {
     //Check temperature
     getUsrSetting(1, &usrTempMin, &usrTempMax);
 
-    if(temperatureReading < usrTempMin)
+    if(temperatureF < usrTempMin)
     {
       sendAlert(true, 2);
     }
-    else if(temperatureReading > usrTempMax)
+    else if(temperatureF > usrTempMax)
     {
       sendAlert(true, 3);
     }

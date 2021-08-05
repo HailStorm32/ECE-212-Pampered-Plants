@@ -169,9 +169,11 @@ static bool measureEnvironment( float *temperature, float *humidity = NULL )
 void printScreen() {
 
 
-float temperatureF;
-measureEnvironment(&temperatureF);
-temperatureF = ((temperatureF = 1.8) +32);
+//float temperatureF = 0;
+float temperatureC = 0;
+//measureEnvironment(&temperatureC);
+//temperatureF = ((temperatureC * 1.8) +32);
+Serial.println(temperatureF);
 
   //This prints the header of the screen like "Sensor Status" at the top.
   lcd.clear();
@@ -496,7 +498,7 @@ void resolveInputFlags() {
         break;  
        case 2:
         measureEnvironment(&temperatureC);
-        temperatureF = ((temperatureC + 1.8) + 32);
+        temperatureF = ((temperatureC * 1.8) + 32);
         
         lcd.clear();
         lcd.setCursor(0,0);
@@ -510,7 +512,7 @@ void resolveInputFlags() {
         break;
        case 3:
         measureEnvironment(&temperatureC);
-        temperatureF = ((temperatureC + 1.8) + 32);
+        temperatureF = ((temperatureC * 1.8) + 32);
         
         lcd.clear();
         lcd.setCursor(0,0);
