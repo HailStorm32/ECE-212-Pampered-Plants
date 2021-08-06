@@ -88,7 +88,7 @@ int parameters[NUM_OF_SCREENS];
 //screens is a variableName[10][2] array, it is a 2D array that has a table of
 // 10 squares and within the squares is 2 values stored.
 //Parameters is a different array. It is 1D. Has 10 squares with 1 value each.
-String testVar = "Test!";
+
 
 //------------End LCD Variables-----------------//
 

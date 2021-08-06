@@ -178,6 +178,7 @@ void pumpWater(uint8_t halfCupOfWater){
 //This section prints output to LCD
 void printScreen() {
 
+  String testVar = "Test!";
   float temperatureScreenC = 0;
   float temperatureScreenF = 0;
 
@@ -187,12 +188,9 @@ void printScreen() {
   lcd.print(screens[currentScreen][0]);
 
 
-   measureEnvironment(&temperatureScreenC);
-   temperatureScreenF = ((temperatureScreenC * 1.8) + 32);
 
-
-   //Serial.print("IN: ");
-   //Serial.println(temperatureScreenF);
+   Serial.print("IN: ");
+   Serial.println(temperatureScreenF);
    
 
   //This is for the default and passive screens, only display, no input.
@@ -201,7 +199,6 @@ void printScreen() {
   lcd.setCursor(0,1);
   lcd.print(screens[currentScreen][1]);
   lcd.print(" ");
- 
   lcd.print(temperatureScreenF);
   lcd.setCursor(0,2);
   lcd.print(screens[currentScreen][2]);
@@ -282,7 +279,14 @@ void printScreen() {
 
   
   //Allow the up and down button to input values for "parameters" array. Just increments of one half-cups screen and any additional screens.
-  else if (currentScreen == 7 || currentScreen > 7){
+  else if (currentScreen == 7){
+  lcd.setCursor(0,1);
+  lcd.print(parameters[currentScreen]);
+  lcd.print(" ");
+  lcd.print(screens[currentScreen][1]);
+  }
+
+  else if (currentScreen > 7){
   lcd.setCursor(0,1);
   lcd.print(parameters[currentScreen]);
   lcd.print(" ");
