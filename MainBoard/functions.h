@@ -179,6 +179,7 @@ void pumpWater(uint8_t halfCupOfWater){
 void printScreen() {
 
   String testVar = "Test!";
+
   float temperatureScreenC = 0;
   float temperatureScreenF = 0;
 
@@ -187,7 +188,8 @@ void printScreen() {
   lcd.setCursor(1,0);
   lcd.print(screens[currentScreen][0]);
 
-
+   measureEnvironment(&temperatureScreenC);
+   temperatureScreenF = ((temperatureScreenC * 1.8) + 32);
 
    Serial.print("IN: ");
    Serial.println(temperatureScreenF);
@@ -501,14 +503,14 @@ void resolveInputFlags() {
     switch(alertType)
     {
       case 0:
-        Serial.println("Alert! Case: Error");
+        //Serial.println("Alert! Case: Error");
         lcd.clear();
         lcd.setCursor(0,0);
         lcd.print("Error! Code failed!");
         lcd.setCursor(0,1);
         break;
        case 1:
-        Serial.println("Alert! Case: Tank Low");
+        //Serial.println("Alert! Case: Tank Low");
         lcd.clear();
         lcd.setCursor(0,0);
         lcd.print("      Alert!      ");
@@ -518,7 +520,7 @@ void resolveInputFlags() {
         lcd.print("Please refill");
         break;  
        case 2:
-        Serial.println("Alert! Case: Temp Too Low");
+        //Serial.println("Alert! Case: Temp Too Low");
         measureEnvironment(&temperatureC);
         temperatureF = ((temperatureC * 1.8) + 32);
         
@@ -533,7 +535,7 @@ void resolveInputFlags() {
         lcd.print((uint8_t)temperatureF);
         break;
        case 3:
-        Serial.println("Alert! Case: Temp Too High");
+        //Serial.println("Alert! Case: Temp Too High");
         measureEnvironment(&temperatureC);
         temperatureF = ((temperatureC * 1.8) + 32);
         
@@ -548,7 +550,7 @@ void resolveInputFlags() {
         lcd.print((uint8_t)temperatureF);
         break; 
        case 4:
-        Serial.println("Alert! Case: Avg Light Bounds Error");
+        //Serial.println("Alert! Case: Avg Light Bounds Error");
         lcd.clear();
         lcd.setCursor(0,0);
         lcd.print("      Alert!      ");
@@ -576,7 +578,7 @@ void resolveInputFlags() {
         }
         break;   
        case 5:
-        Serial.println("Alert! Case: Soil Too Wet");
+        //Serial.println("Alert! Case: Soil Too Wet");
         lcd.clear();
         lcd.setCursor(0,0);
         lcd.print("      Alert!      ");
@@ -603,7 +605,7 @@ void resolveInputFlags() {
             break;
         }
        case 6:
-        Serial.println("Alert! Case: Soil Too Dry");
+        //Serial.println("Alert! Case: Soil Too Dry");
         lcd.clear();
         lcd.setCursor(0,0);
         lcd.print("      Alert!      ");
