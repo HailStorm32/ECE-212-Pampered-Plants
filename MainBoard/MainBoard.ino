@@ -59,6 +59,8 @@ uint16_t sumOfLightReadings = 0;
 uint8_t lightAvg = 0;
 bool paramsDataUpdated = false;
 
+float temperatureGlobalF = 0;
+
 
 
 
@@ -163,7 +165,7 @@ pinMode(WATER_PUMP_SIGNAL_PIN, OUTPUT);
 }
 
 
-//float temperatureReadingTemp = 0;
+float temperatureReadingTempC = 0;
 //float temperatureT = 0;
 
 //This is the loop. This is the heart that let's everything in motion.
@@ -173,11 +175,11 @@ void loop() {
    //Serial.print("Soil: ");
   // Serial.println(readSoil());
 
-   /*measureEnvironment(&temperatureReadingTemp);
-   temperatureF = ((temperatureReadingTemp * 1.8) + 32);
+   measureEnvironment(&temperatureReadingTempC);
+   temperatureGlobalF = ((temperatureReadingTempC * 1.8) + 32);
 
-   Serial.print("Temp: ");
-   Serial.println(temperatureF);*/
+  // Serial.print("Temp: ");
+  // Serial.println(temperatureF);
 
   
 

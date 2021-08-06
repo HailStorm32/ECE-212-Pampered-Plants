@@ -180,19 +180,22 @@ void printScreen() {
 
   String testVar = "Test!";
 
-  float temperatureScreenC = 0;
-  float temperatureScreenF = 0;
+  //float temperatureScreenC = 0;
+  //float temperatureScreenF = 0;
+
+  //measureEnvironment(&temperatureScreenC);
+  //temperatureScreenF = ((temperatureScreenC * 1.8) + 32);
+
 
   //This prints the header of the screen like "Sensor Status" at the top.
   lcd.clear();
   lcd.setCursor(1,0);
   lcd.print(screens[currentScreen][0]);
 
-   measureEnvironment(&temperatureScreenC);
-   temperatureScreenF = ((temperatureScreenC * 1.8) + 32);
+
 
    Serial.print("IN: ");
-   Serial.println(temperatureScreenF);
+   Serial.println(temperatureGlobalF);
    
 
   //This is for the default and passive screens, only display, no input.
@@ -201,7 +204,7 @@ void printScreen() {
   lcd.setCursor(0,1);
   lcd.print(screens[currentScreen][1]);
   lcd.print(" ");
-  lcd.print(temperatureScreenF);
+  lcd.print(temperatureGlobalF);
   lcd.setCursor(0,2);
   lcd.print(screens[currentScreen][2]);
   lcd.print(" ");
