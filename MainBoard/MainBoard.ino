@@ -167,6 +167,7 @@ pinMode(WATER_PUMP_SIGNAL_PIN, OUTPUT);
 
 float temperatureReadingTempC = 0;
 //float temperatureT = 0;
+float humidity = 0;
 
 //This is the loop. This is the heart that let's everything in motion.
 //It is always looping. We love loop.
@@ -175,7 +176,8 @@ void loop() {
    //Serial.print("Soil: ");
   // Serial.println(readSoil());
 
-   measureEnvironment(&temperatureReadingTempC);
+   //measureEnvironment(&temperatureReadingTempC);
+   dht_sensor.measure( &temperatureReadingTempC, &humidity );
    temperatureGlobalF = ((temperatureReadingTempC * 1.8) + 32);
 
   // Serial.print("Temp: ");
