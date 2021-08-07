@@ -77,10 +77,10 @@ long debounceDelay = 5;
 
 
 //Determine your screen count and creating arrays for screen and what is to be displayed
-const uint8_t NUM_OF_SCREENS = 10;
+const uint8_t NUM_OF_SCREENS = 6;
 uint8_t currentScreen = 0;
-String screens[NUM_OF_SCREENS][5] = {{"Sensor Status 1/3","Temp:","Moisture:","Water level:"},{"Sensor Status 2/3", "Humidity:","Light:","Water resv lvl:"},{"Sensor Status 3/3","passive disp1:","passive disp2:","passive disp3:"},{"Min Temperature","deg in F"},{"Max Temperature", "Deg F"},
-{"Water Profile","Selected"},{"Light Profile","Selected"},{"Add half-cups water", "half-cups"},{"Restart Time","Mins"},{"Analog Out. Curr.","mA"}};
+String screens[NUM_OF_SCREENS][5] = {{"Sensor Status 1/3","Temp:","Moisture:","Light:"},{"Min Temperature","deg in F"},{"Max Temperature", "Deg F"},
+{"Soil Moist Profile","Selected"},{"Light Profile","Selected"},{"Add half-cups water", "half-cups"}};
 int parameters[NUM_OF_SCREENS];
 
 
