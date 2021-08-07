@@ -194,8 +194,8 @@ void printScreen() {
 
 
 
-   Serial.print("IN: ");
-   Serial.println(temperatureGlobalF);
+   //Serial.print("IN: ");
+   //Serial.println(temperatureGlobalF);
    
 
   //This is for the default and passive screens, only display, no input.

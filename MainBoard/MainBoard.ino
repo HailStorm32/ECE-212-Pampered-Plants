@@ -184,6 +184,27 @@ void loop() {
   // Serial.println(temperatureF);
 
   
+  //Begin storing user settings code
+  if(paramsDataUpdated)
+  {
+    for(uint8_t indx = 0; indx < 5; indx++)
+    {
+      storeUsrSettings(indx, parameters[indx+1]);
+    }
+    /*storeUsrSettings(0, parameters[1]);//store temerature min data
+    storeUsrSettings(1, parameters[2]);//store temerature min data
+    storeUsrSettings(2, parameters[3]);//store soil moisture profile data
+    storeUsrSettings(3, parameters[4]);//store light profile data
+    storeUsrSettings(4, parameters[5]);//store # of half cups per watering data
+    */
+    //1 -- temperature min
+    //2 -- temperature max
+    //3 -- soil moisture
+    //4 -- light
+    //5 -- half cups
+
+    paramsDataUpdated = false;
+  }
 
 
   
@@ -192,6 +213,28 @@ void loop() {
   //Only measure sensors at set intervals
   if((millis() - lastMeasurement) >= MONITOR_INTERVAL)
   {
+    //-------BEGIN DEBUG CODE ---------
+    uint8_t debugUsrTempMin = 255;
+    uint8_t debugUsrTempMax = 255;
+
+    getUsrSetting(1, &debugUsrTempMin, &debugUsrTempMax);
+
+    Serial.print("User Set Min Temp: ");
+    Serial.println(debugUsrTempMin);
+    Serial.print("User Set Max Temp: ");
+    Serial.println(debugUsrTempMin);
+
+    Serial.print("User Set Soil profile: ");
+    Serial.println(getUsrSetting(2));
+
+    Serial.print("User Set light profile: ");
+    Serial.println(getUsrSetting(3));
+
+    Serial.print("User Set halfcup profile: ");
+    Serial.println(getUsrSetting(4));
+    //-------END DEBUG CODE ---------
+
+    
     uint8_t usrTempMin = 53;
     uint8_t usrTempMax = 85;
     
@@ -311,24 +354,6 @@ void loop() {
 
   //End LCD code
 
-
-
-  //Begin storing user settings code
-  if(paramsDataUpdated)
-  {
-    for(uint8_t indx = 0; indx < 5; indx++)
-    {
-      storeUsrSettings(indx, parameters[indx+3]);
-    }
-    /*storeUsrSettings(0, parameters[3]);//store temerature min data
-    storeUsrSettings(1, parameters[4]);//store temerature min data
-    storeUsrSettings(2, parameters[5]);//store soil moisture profile data
-    storeUsrSettings(3, parameters[6]);//store light profile data
-    storeUsrSettings(4, parameters[7]);//store # of half cups per watering data
-    */
-
-    paramsDataUpdated = false;
-  }
 }
 
 
