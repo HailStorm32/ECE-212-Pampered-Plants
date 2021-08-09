@@ -12,7 +12,7 @@ const uint8_t LDR_1_PIN = A0;
 const uint8_t LDR_2_PIN = A1;
 const uint8_t DHT_SENSOR_PIN = 2;
 const uint8_t PHOTON_WK_PIN = 9;
-const uint32_t MONITOR_INTERVAL = 300000; // 5min -- monitor interval in milliseconds
+const uint32_t MONITOR_INTERVAL = 60000; // 5min -- monitor interval in milliseconds
 const uint8_t MAX_NUM_LIGHT_MEASUREMENTS = 143; //Should work out to be an average over 12hrs
 const uint8_t PHOTON_I2C_ADDR = 8;
 const uint8_t WATER_PUMP_SIGNAL_PIN = 1;
@@ -79,7 +79,7 @@ long debounceDelay = 5;
 //Determine your screen count and creating arrays for screen and what is to be displayed
 const uint8_t NUM_OF_SCREENS = 6;
 uint8_t currentScreen = 0;
-String screens[NUM_OF_SCREENS][5] = {{"Sensor Status 1/3","Temp:","Moisture:","Light:"},{"Min Temperature","deg in F"},{"Max Temperature", "Deg F"},
+String screens[NUM_OF_SCREENS][5] = {{"Sensor Status","Temp:","Moisture:","Light:"},{"Min Temperature","deg in F"},{"Max Temperature", "Deg F"},
 {"Soil Moist Profile","Selected"},{"Light Profile","Selected"},{"Add half-cups water", "half-cups"}};
 int parameters[NUM_OF_SCREENS];
 
@@ -144,7 +144,17 @@ pinMode(WATER_PUMP_SIGNAL_PIN, OUTPUT);
   //Initialize LCD itself
 	lcd.init();   // initializing the LCD
   lcd.backlight(); // Enable or Turn On the backlight
+  
+  uint8_t initUsrTempMin = 0;
+  uint8_t initUsrTempMax = 0;
 
+  getUsrSetting(1, &initUsrTempMin, &initUsrTempMax);
+  
+  parameters[1] = initUsrTempMin/5; //store temerature min data
+  parameters[2] = initUsrTempMax/5; //store temerature max data
+  parameters[3] = getUsrSetting(2); //store soil moisture profile data
+  parameters[4] = getUsrSetting(3); //store light profile data
+  parameters[5] = getUsrSetting(4); //store # of half cups per watering data
 
   
 	//Initial setup of default LCD screen bootup
@@ -180,23 +190,47 @@ void loop() {
    dht_sensor.measure( &temperatureReadingTempC, &humidity );
    temperatureGlobalF = ((temperatureReadingTempC * 1.8) + 32);
 
-  // Serial.print("Temp: ");
-  // Serial.println(temperatureF);
+   //Serial.print("Temp: ");
+   //Serial.println(temperatureGlobalF);
+
+      //-------BEGIN DEBUG CODE ---------
+   /* uint8_t debugUsrTempMin = 255;
+    uint8_t debugUsrTempMax = 255;
+
+    getUsrSetting(1, &debugUsrTempMin, &debugUsrTempMax);
+
+    Serial.print("User Set Min Temp: ");
+    Serial.println(debugUsrTempMin);
+    Serial.print("User Set Max Temp: ");
+    Serial.println(debugUsrTempMax);
+
+    Serial.print("User Set Soil profile: ");
+    Serial.println(getUsrSetting(2));
+
+    Serial.print("User Set light profile: ");
+    Serial.println(getUsrSetting(3));
+
+    Serial.print("User Set halfcup profile: ");
+    Serial.println(getUsrSetting(4));
+
+    Serial.println(" ");
+    Serial.println(" ");*/
+    //-------END DEBUG CODE ---------
 
   
   //Begin storing user settings code
   if(paramsDataUpdated)
   {
-    for(uint8_t indx = 0; indx < 5; indx++)
+    /*for(uint8_t indx = 0; indx < 5; indx++)
     {
       storeUsrSettings(indx, parameters[indx+1]);
-    }
-    /*storeUsrSettings(0, parameters[1]);//store temerature min data
-    storeUsrSettings(1, parameters[2]);//store temerature min data
+    }*/
+    storeUsrSettings(0, parameters[1]*5);//store temerature min data
+    storeUsrSettings(1, parameters[2]*5);//store temerature min data
     storeUsrSettings(2, parameters[3]);//store soil moisture profile data
     storeUsrSettings(3, parameters[4]);//store light profile data
     storeUsrSettings(4, parameters[5]);//store # of half cups per watering data
-    */
+    
     //1 -- temperature min
     //2 -- temperature max
     //3 -- soil moisture
@@ -213,7 +247,8 @@ void loop() {
   //Only measure sensors at set intervals
   if((millis() - lastMeasurement) >= MONITOR_INTERVAL)
   {
-    //-------BEGIN DEBUG CODE ---------
+    Serial.println("IN Monitor");
+/*    //-------BEGIN DEBUG CODE ---------
     uint8_t debugUsrTempMin = 255;
     uint8_t debugUsrTempMax = 255;
 
@@ -231,7 +266,7 @@ void loop() {
     Serial.println(getUsrSetting(3));
 
     Serial.print("User Set halfcup profile: ");
-    Serial.println(getUsrSetting(4));
+    Serial.println(getUsrSetting(4));*/
     //-------END DEBUG CODE ---------
 
     
@@ -248,17 +283,18 @@ void loop() {
     measureEnvironment(&temperatureReadingC);
     temperatureReadingF = ((temperatureReadingC * 1.8) + 32);
     
-   
+   Serial.println("Checking tank");
     //Check water tank level
     if(tankLevel == 0)
     {
       sendAlert(true, 1);
     }
-    
+
+    Serial.println("Checking moisture");
     //Check moisture sensor
     switch(getUsrSetting(2))
     {
-      case 1:
+      case 0:
         if(moistureReading < SOIL_PARAM.MIN_LOWER)
         {
           pumpWater(getUsrSetting(4));
@@ -268,7 +304,7 @@ void loop() {
           sendAlert(true, 5);
         }
         break;
-      case 2:
+      case 1:
         if(moistureReading < SOIL_PARAM.MED_LOWER)
         {
           pumpWater(getUsrSetting(4));
@@ -278,7 +314,7 @@ void loop() {
           sendAlert(true, 5);
         }
         break;
-      case 3:
+      case 2:
         if(moistureReading < SOIL_PARAM.MAX_LOWER)
         {
           pumpWater(getUsrSetting(4));
@@ -290,9 +326,9 @@ void loop() {
         break;
     }
 
-    
+    Serial.println("Checking light");
     //Check light sensor
-
+    
     //If we havn't gatherd all the readings, gather another reading
     if(numOfLightMeasurements < MAX_NUM_LIGHT_MEASUREMENTS)
     {
@@ -305,19 +341,19 @@ void loop() {
 
       switch(getUsrSetting(3))
       {
-        case 1:
+        case 0:
           if(lightAvg < LIGHT_PARAM.MIN_LOWER || lightAvg > LIGHT_PARAM.MIN_UPPER)
           {
             sendAlert(false, 4);
           }
           break;
-        case 2:
+        case 1:
           if(lightAvg < LIGHT_PARAM.MED_LOWER || lightAvg > LIGHT_PARAM.MED_UPPER)
           {
             sendAlert(false, 4);
           }
           break;
-        case 3:
+        case 2:
           if(lightAvg < LIGHT_PARAM.MAX_LOWER || lightAvg > LIGHT_PARAM.MAX_UPPER)
           {
             sendAlert(false, 4);
@@ -330,6 +366,7 @@ void loop() {
       sumOfLightReadings = 0;
     }
 
+    Serial.println("Checking temp");
     //Check temperature
     getUsrSetting(1, &usrTempMin, &usrTempMax);
 
