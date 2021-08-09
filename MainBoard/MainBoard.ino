@@ -13,9 +13,9 @@ const uint8_t LDR_2_PIN = A1;
 const uint8_t DHT_SENSOR_PIN = 2;
 const uint8_t PHOTON_WK_PIN = 9;
 const uint32_t MONITOR_INTERVAL = 60000; // 5min -- monitor interval in milliseconds
-const uint8_t MAX_NUM_LIGHT_MEASUREMENTS = 143; //Should work out to be an average over 12hrs
+const uint8_t MAX_NUM_LIGHT_MEASUREMENTS = 3; //Should work out to be an average over 12hrs 143
 const uint8_t PHOTON_I2C_ADDR = 8;
-const uint8_t WATER_PUMP_SIGNAL_PIN = 1;
+const uint8_t WATER_PUMP_SIGNAL_PIN = 10;
 const uint8_t WATER_LEVEL = 4; 
 
 struct eepromAddresses
@@ -47,11 +47,6 @@ struct lightSensorBounds
   const uint8_t MAX_UPPER = 255; 
 }LIGHT_PARAM;
 
-/*struct temperatureSensorBounds
-{
-  uint8_t MIN = 12; //default temp in C
-  uint8_t MAX = 26; //default temp in C
-}TEMPERATURE_PARAM;*/
 
 unsigned long lastMeasurement = 0;
 uint8_t numOfLightMeasurements = 0;
@@ -144,6 +139,8 @@ pinMode(WATER_PUMP_SIGNAL_PIN, OUTPUT);
   //Initialize LCD itself
 	lcd.init();   // initializing the LCD
   lcd.backlight(); // Enable or Turn On the backlight
+
+  Serial.println("Booted");
   
   uint8_t initUsrTempMin = 0;
   uint8_t initUsrTempMax = 0;
@@ -278,7 +275,8 @@ void loop() {
     uint8_t lightReading = getLightReading();
     float temperatureReadingC = 0;
     float temperatureReadingF = 0;
-    bool tankLevel = 1; //Holder until water level function is written
+    bool tankLevel = getWaterLevel(); 
+    //tankLevel = 1;//Holder until water level function is written
 
     measureEnvironment(&temperatureReadingC);
     temperatureReadingF = ((temperatureReadingC * 1.8) + 32);
@@ -297,7 +295,12 @@ void loop() {
       case 0:
         if(moistureReading < SOIL_PARAM.MIN_LOWER)
         {
-          pumpWater(getUsrSetting(4));
+          if(!pumpWater(getUsrSetting(4)))
+          {
+            sendAlert(true, 1);
+          }
+          lcd.clear();
+          printScreen();
         }
         else if(moistureReading > SOIL_PARAM.MIN_UPPER)
         {
@@ -307,7 +310,12 @@ void loop() {
       case 1:
         if(moistureReading < SOIL_PARAM.MED_LOWER)
         {
-          pumpWater(getUsrSetting(4));
+          if(!pumpWater(getUsrSetting(4)))
+          {
+            sendAlert(true, 1);
+          }
+          lcd.clear();
+          printScreen();
         }
         else if(moistureReading > SOIL_PARAM.MED_UPPER)
         {
@@ -317,7 +325,12 @@ void loop() {
       case 2:
         if(moistureReading < SOIL_PARAM.MAX_LOWER)
         {
-          pumpWater(getUsrSetting(4));
+          if(!pumpWater(getUsrSetting(4)))
+          {
+            sendAlert(true, 1);
+          }
+          lcd.clear();
+          printScreen();
         }
         else if(moistureReading > SOIL_PARAM.MAX_UPPER)
         {

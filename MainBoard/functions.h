@@ -45,17 +45,16 @@
  *   bool -- getWaterLevel which is false for water full and true for water Low
  */              
 bool getWaterLevel()
- 
 {
     bool waterLevel = false;
     waterLevel = digitalRead(WATER_LEVEL); 
   if (waterLevel == false) 
   { 
-    return (waterLevel);  // "WATER LEVEL - HIGH")
+    return true;  // "WATER LEVEL - HIGH")
   } 
   else 
   { 
-    return (waterLevel); // "WATER LEVEL - LOW"
+    return false; // "WATER LEVEL - LOW"
   } 
 }
 
@@ -117,17 +116,26 @@ int readSoil()
  *   int halfCupOfWater
  *   
  * Return:
- *   none
+ *   true -- watered
+ *   false -- ranout of water
  */
-void pumpWater(uint8_t halfCupOfWater){
+  bool pumpWater(uint8_t halfCupOfWater){
+    lcd.clear();
+    lcd.setCursor(0,0);
+    lcd.print("Watering...");
+    lcd.setCursor(0,1);
     
     for(uint8_t i = 0; i < halfCupOfWater; i++){
-    //if(getWaterLevel()==false){}
-    digitalWrite(WATER_PUMP_SIGNAL_PIN, HIGH);                      
-    delay(5000);                             
-    digitalWrite(WATER_PUMP_SIGNAL_PIN, LOW);
-    delay(10000);
+      if(getWaterLevel()==false)
+      {
+        return false;
+      }
+      digitalWrite(WATER_PUMP_SIGNAL_PIN, HIGH);                      
+      delay(5000);                             
+      digitalWrite(WATER_PUMP_SIGNAL_PIN, LOW);
+      delay(10000);
     }
+    return true;
   }
 
 
