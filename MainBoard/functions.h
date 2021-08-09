@@ -122,6 +122,7 @@ int readSoil()
 void pumpWater(uint8_t halfCupOfWater){
     
     for(uint8_t i = 0; i < halfCupOfWater; i++){
+    //if(getWaterLevel()==false){}
     digitalWrite(WATER_PUMP_SIGNAL_PIN, HIGH);                      
     delay(5000);                             
     digitalWrite(WATER_PUMP_SIGNAL_PIN, LOW);
